@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Caja Virtual - Irvin</title>
+  <style>
+    /* Estilo base similar a VirtualAssistance */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #222831;
+      color: #eeeeee;
+      margin: 0; padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .container {
+      background: #393e46;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-weight: 600;
+      color: #00adb5;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .item-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .autocomplete-container {
+      position: relative;
+      flex: 2;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    input[type="text"] {
+      background: #222831;
+      color: #eeeeee;
+      border: 1px solid #393e46;
+    }
+
+    input[type="number"] {
+      max-width: 80px;
+      background: #222831;
+      color: #eeeeee;
+      border: 1px solid #393e46;
+      text-align: center;
+    }
+
+    /* Dropdown autocompletado */
+    .autocomplete-list {
+      position: absolute;
+      top: 42px;
+      left: 0;
+      right: 0;
+      background: #222831;
+      border: 1px solid #00adb5;
+      border-top: none;
+      max-height: 150px;
+      overflow-y: auto;
+      z-index: 999;
+      border-radius: 0 0 6px 6px;
+    }
+
+    .autocomplete-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .autocomplete-item:hover {
+      background: #00adb5;
+      color: #222831;
+    }
+
+    /* Total y botón */
+    .total-container {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #00adb5;
+    }
+
+    button {
+      margin-top: 24px;
+      background: #00adb5;
+      color: #222831;
+      font-weight: 600;
+      padding: 14px 0;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+      font-size: 1.1rem;
+    }
+
+    button:hover {
+      background: #028a97;
+    }
+
+    /* Mensajes */
+    #msg {
+      margin-top: 16px;
+      font-weight: 600;
+      text-align: center;
+      min-height: 24px;
+    }
+
+    #msg.error {
+      color: #ff4c4c;
+    }
+    #msg.success {
+      color: #4caf50;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Caja Virtual</h1>
+    <form id="cajaForm" autocomplete="off">
+
+      <!-- Campo obligatorio -->
+      <div class="item-row">
+        <div class="autocomplete-container">
+          <input type="text" id="producto0" placeholder="Producto (obligatorio)" required />
+          <div class="autocomplete-list" id="list0"></div>
+        </div>
+        <input type="number" id="cantidad0" placeholder="Cant." min="1" required value="1" />
+      </div>
+
+      <!-- Otros 5 campos dinámicos -->
+      <div class="item-row">
+        <div class="autocomplete-container">
+          <input type="text" id="producto1" placeholder="Producto" />
+          <div class="autocomplete-list" id="list1"></div>
+        </div>
+        <input type="number" id="cantidad1" placeholder="Cant." min="0" value="0" />
+      </div>
+      <div class="item-row">
+        <div class="autocomplete-container">
+          <input type="text" id="producto2" placeholder="Producto" />
+          <div class="autocomplete-list" id="list2"></div>
+        </div>
+        <input type="number" id="cantidad2" placeholder="Cant." min="0" value="0" />
+      </div>
+      <div class="item-row">
+        <div class="autocomplete-container">
+          <input type="text" id="producto3" placeholder="Producto" />
+          <div class="autocomplete-list" id="list3"></div>
+        </div>
+        <input type="number" id="cantidad3" placeholder="Cant." min="0" value="0" />
+      </div>
+      <div class="item-row">
+        <div class="autocomplete-container">
+          <input type="text" id="producto4" placeholder="Producto" />
+          <div class="autocomplete-list" id="list4"></div>
+        </div>
+        <input type="number" id="cantidad4" placeholder="Cant." min="0" value="0" />
+      </div>
+      <div class="item-row">
+        <div class="autocomplete-container">
+          <input type="text" id="producto5" placeholder="Producto" />
+          <div class="autocomplete-list" id="list5"></div>
+        </div>
+        <input type="number" id="cantidad5" placeholder="Cant." min="0" value="0" />
+      </div>
+
+      <!-- Total -->
+      <div class="total-container">
+        <div>Total:</div>
+        <div id="total">$0.00</div>
+      </div>
+
+      <button type="submit">Registrar</button>
+
+      <div id="msg"></div>
+    </form>
+  </div>
+
+  <script>
+    // Productos y precios
+    const productos = [
+      "Hamburguesa",
+      "Tacos",
+      "Enchilada",
+      "Repocheta",
+      "Gaseosa",
+      "Hot-Dog",
+      "Fresco"
+    ];
+
+    const precios = {
+      "Hamburguesa": 50,
+      "Tacos": 50,
+      "Enchilada": 50,
+      "Repocheta": 50,
+      "Gaseosa": 25,
+      "Hot-Dog": 50,
+      "Fresco": 15
+    };
+
+    // Función para autocompletar
+    function setupAutocomplete(inputEl, listEl) {
+      inputEl.addEventListener("input", () => {
+        const val = inputEl.value.toLowerCase();
+        listEl.innerHTML = "";
+        if (!val) return;
+
+        const filtered = productos.filter(p => p.toLowerCase().includes(val));
+
+        filtered.forEach(item => {
+          const div = document.createElement("div");
+          div.classList.add("autocomplete-item");
+          div.textContent = item;
+          div.onclick = () => {
+            inputEl.value = item;
+            listEl.innerHTML = "";
+            updateTotal();
+          };
+          listEl.appendChild(div);
+        });
+      });
+
+      // Cerrar lista si se hace click fuera
+      document.addEventListener("click", e => {
+        if (e.target !== inputEl) {
+          listEl.innerHTML = "";
+        }
+      });
+    }
+
+    // Calcular total
+    function updateTotal() {
+      let total = 0;
+      for (let i = 0; i <= 5; i++) {
+        const prod = document.getElementById("producto" + i).value;
+        const qty = parseInt(document.getElementById("cantidad" + i).value) || 0;
+        if (prod && precios[prod]) {
+          total += precios[prod] * qty;
+        }
+      }
+      document.getElementById("total").textContent = "$" + total.toFixed(2);
+      return total;
+    }
+
+    // Configurar autocompletado en todos los inputs de producto
+    for (let i = 0; i <= 5; i++) {
+      setupAutocomplete(
+        document.getElementById("producto" + i),
+        document.getElementById("list" + i)
+      );
+      // Actualizar total si cambian cantidades
+      document.getElementById("cantidad" + i).addEventListener("input", updateTotal);
+      document.getElementById("producto" + i).addEventListener("change", updateTotal);
+    }
+
+    // Enviar datos al backend
+    document.getElementById("cajaForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const msgEl = document.getElementById("msg");
+      msgEl.textContent = "";
+      msgEl.className = "";
+
+      // Validar campo obligatorio producto0 y cantidad0
+      const prod0 = document.getElementById("producto0").value.trim();
+      const qty0 = parseInt(document.getElementById("cantidad0").value);
+      if (!prod0 || qty0 < 1) {
+        msgEl.textContent = "El primer producto y cantidad son obligatorios y válidos.";
+        msgEl.className = "error";
+        return;
+      }
+
+      // Construir lista de productos vendidos
+      const vendidos = [];
+      for (let i = 0; i <=5; i++) {
+        const p = document.getElementById("producto" + i).value.trim();
+        const q = parseInt(document.getElementById("cantidad" + i).value);
+        if (p && q > 0) {
+          vendidos.push({ producto: p, cantidad: q });
+        }
+      }
+
+      const total = updateTotal();
+
+      // Datos a enviar
+      const dataToSend = {
+        vendidos,
+        total
+      };
+
+      // Aquí va la URL de tu API en Render (placeholder)
+      const API_URL = "https://tu-api-en-render.onrender.com/ventas";
+
+      fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Error en el servidor");
+        return res.json();
+      })
+      .then(data => {
+        msgEl.textContent = "Venta registrada correctamente.";
+        msgEl.className = "success";
+        // Reset form
+        document.getElementById("cajaForm").reset();
+        updateTotal();
+      })
+      .catch(err => {
+        msgEl.textContent = "Error al registrar la venta: " + err.message;
+        msgEl.className = "error";
+      });
+    });
+
+    // Inicializar total en 0
+    updateTotal();
+
+  </script>
+</body>
+</html>
