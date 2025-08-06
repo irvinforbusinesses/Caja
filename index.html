@@ -3,14 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Caja Virtual - Irvin</title>
+  <title>Caja Virtual - Irvin Prado</title>
+  <link rel="icon" href="https://raw.githubusercontent.com/Irvyandl/VirtualAssistance/refs/heads/main/logo.ico" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Poppins:wght@700&display=swap" rel="stylesheet" />
   <style>
-    /* Estilo base similar a VirtualAssistance */
+    :root {
+      --color-bg: #E8F0F5;
+      --color-accent: #2F528F;
+      --color-light: #FFFFFF;
+      --color-text-dark: #1A1A1A;
+      --input-border: #ccc;
+      --input-focus-border: #2F528F;
+      --button-hover: #1d3b6c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: 'Poppins', sans-serif;
-      background: #222831;
-      color: #eeeeee;
-      margin: 0; padding: 20px;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #F6F8FB, #E8F0F5);
+      color: var(--color-text-dark);
+      padding: 4rem 2rem;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -18,59 +35,59 @@
     }
 
     .container {
-      background: #393e46;
-      border-radius: 12px;
-      padding: 24px;
-      max-width: 520px;
+      max-width: 700px;
       width: 100%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      background: var(--color-light);
+      padding: 2rem 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     h1 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-accent);
       text-align: center;
-      margin-bottom: 24px;
-      font-weight: 600;
-      color: #00adb5;
     }
 
     form {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 1rem;
     }
 
     .item-row {
       display: flex;
-      gap: 12px;
+      gap: 1rem;
       align-items: center;
     }
 
     .autocomplete-container {
       position: relative;
-      flex: 2;
+      flex: 1.8;
     }
 
     input[type="text"], input[type="number"] {
       width: 100%;
-      padding: 10px 12px;
+      padding: 0.75rem 1rem;
       border-radius: 6px;
-      border: none;
+      border: 1px solid var(--input-border);
       font-size: 1rem;
-      outline: none;
-      box-sizing: border-box;
+      outline-offset: 2px;
+      outline-color: transparent;
+      transition: outline-color 0.3s, border-color 0.3s;
+      font-family: 'Inter', sans-serif;
     }
 
-    input[type="text"] {
-      background: #222831;
-      color: #eeeeee;
-      border: 1px solid #393e46;
+    input[type="text"]:focus, input[type="number"]:focus {
+      border-color: var(--input-focus-border);
+      outline-color: var(--input-focus-border);
     }
 
     input[type="number"] {
-      max-width: 80px;
-      background: #222831;
-      color: #eeeeee;
-      border: 1px solid #393e46;
+      max-width: 90px;
       text-align: center;
     }
 
@@ -80,65 +97,102 @@
       top: 42px;
       left: 0;
       right: 0;
-      background: #222831;
-      border: 1px solid #00adb5;
+      background: var(--color-light);
+      border: 1px solid var(--color-accent);
       border-top: none;
-      max-height: 150px;
+      max-height: 140px;
       overflow-y: auto;
       z-index: 999;
       border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 8px rgba(47,82,143,0.1);
     }
 
     .autocomplete-item {
       padding: 8px 12px;
       cursor: pointer;
       user-select: none;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text-dark);
     }
+
     .autocomplete-item:hover {
-      background: #00adb5;
-      color: #222831;
+      background: var(--color-accent);
+      color: var(--color-light);
     }
 
     /* Total y botón */
     .total-container {
-      margin-top: 24px;
+      margin-top: 1.5rem;
       display: flex;
       justify-content: space-between;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #00adb5;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--color-accent);
+      font-family: 'Poppins', sans-serif;
     }
 
     button {
-      margin-top: 24px;
-      background: #00adb5;
-      color: #222831;
-      font-weight: 600;
-      padding: 14px 0;
+      margin-top: 1.5rem;
+      background-color: var(--color-accent);
+      color: var(--color-light);
+      font-weight: 700;
+      padding: 1rem 0;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.25s ease;
+      transition: background-color 0.3s ease;
       font-size: 1.1rem;
+      font-family: 'Poppins', sans-serif;
     }
 
     button:hover {
-      background: #028a97;
+      background-color: var(--button-hover);
     }
 
     /* Mensajes */
     #msg {
-      margin-top: 16px;
+      margin-top: 1rem;
       font-weight: 600;
       text-align: center;
       min-height: 24px;
+      font-family: 'Inter', sans-serif;
     }
 
     #msg.error {
-      color: #ff4c4c;
+      color: #d93025;
     }
+
     #msg.success {
-      color: #4caf50;
+      color: #188038;
+    }
+
+    /* Mobile adaptation */
+    @media (max-width: 600px) {
+      body {
+        padding: 2rem 1rem;
+      }
+
+      .container {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      input[type="text"], input[type="number"], button {
+        font-size: 1rem;
+      }
+
+      .item-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      input[type="number"] {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
@@ -146,53 +200,63 @@
 
   <div class="container">
     <h1>Caja Virtual</h1>
-    <form id="cajaForm" autocomplete="off">
+    <form id="cajaForm" autocomplete="off" spellcheck="false">
 
       <!-- Campo obligatorio -->
       <div class="item-row">
         <div class="autocomplete-container">
-          <input type="text" id="producto0" placeholder="Producto (obligatorio)" required />
+          <input type="text" id="producto0" placeholder="Producto (obligatorio)" required list="productos-list"/>
           <div class="autocomplete-list" id="list0"></div>
         </div>
         <input type="number" id="cantidad0" placeholder="Cant." min="1" required value="1" />
       </div>
 
-      <!-- Otros 5 campos dinámicos -->
+      <!-- Otros 5 campos -->
       <div class="item-row">
         <div class="autocomplete-container">
-          <input type="text" id="producto1" placeholder="Producto" />
+          <input type="text" id="producto1" placeholder="Producto" list="productos-list" />
           <div class="autocomplete-list" id="list1"></div>
         </div>
         <input type="number" id="cantidad1" placeholder="Cant." min="0" value="0" />
       </div>
       <div class="item-row">
         <div class="autocomplete-container">
-          <input type="text" id="producto2" placeholder="Producto" />
+          <input type="text" id="producto2" placeholder="Producto" list="productos-list" />
           <div class="autocomplete-list" id="list2"></div>
         </div>
         <input type="number" id="cantidad2" placeholder="Cant." min="0" value="0" />
       </div>
       <div class="item-row">
         <div class="autocomplete-container">
-          <input type="text" id="producto3" placeholder="Producto" />
+          <input type="text" id="producto3" placeholder="Producto" list="productos-list" />
           <div class="autocomplete-list" id="list3"></div>
         </div>
         <input type="number" id="cantidad3" placeholder="Cant." min="0" value="0" />
       </div>
       <div class="item-row">
         <div class="autocomplete-container">
-          <input type="text" id="producto4" placeholder="Producto" />
+          <input type="text" id="producto4" placeholder="Producto" list="productos-list" />
           <div class="autocomplete-list" id="list4"></div>
         </div>
         <input type="number" id="cantidad4" placeholder="Cant." min="0" value="0" />
       </div>
       <div class="item-row">
         <div class="autocomplete-container">
-          <input type="text" id="producto5" placeholder="Producto" />
+          <input type="text" id="producto5" placeholder="Producto" list="productos-list" />
           <div class="autocomplete-list" id="list5"></div>
         </div>
         <input type="number" id="cantidad5" placeholder="Cant." min="0" value="0" />
       </div>
+
+      <datalist id="productos-list">
+        <option value="Hamburguesa"></option>
+        <option value="Tacos"></option>
+        <option value="Enchilada"></option>
+        <option value="Repocheta"></option>
+        <option value="Gaseosa"></option>
+        <option value="Hot-Dog"></option>
+        <option value="Fresco"></option>
+      </datalist>
 
       <!-- Total -->
       <div class="total-container">
@@ -206,145 +270,182 @@
     </form>
   </div>
 
-  <script>
-    // Productos y precios
-    const productos = [
-      "Hamburguesa",
-      "Tacos",
-      "Enchilada",
-      "Repocheta",
-      "Gaseosa",
-      "Hot-Dog",
-      "Fresco"
-    ];
+<script>
+  // Productos y precios con códigos únicos
+  const productos = [
+    { codigo: 1, nombre: "Hamburguesa", precio: 50 },
+    { codigo: 2, nombre: "Tacos", precio: 50 },
+    { codigo: 3, nombre: "Enchilada", precio: 50 },
+    { codigo: 4, nombre: "Repocheta", precio: 50 },
+    { codigo: 5, nombre: "Gaseosa", precio: 25 },
+    { codigo: 6, nombre: "Hot-Dog", precio: 50 },
+    { codigo: 7, nombre: "Fresco", precio: 15 }
+  ];
 
-    const precios = {
-      "Hamburguesa": 50,
-      "Tacos": 50,
-      "Enchilada": 50,
-      "Repocheta": 50,
-      "Gaseosa": 25,
-      "Hot-Dog": 50,
-      "Fresco": 15
-    };
+  // Mapas para búsqueda rápida
+  const nombreACodigo = {};
+  const codigoAPrecio = {};
+  productos.forEach(p => {
+    nombreACodigo[p.nombre.toLowerCase()] = p.codigo;
+    codigoAPrecio[p.codigo] = p.precio;
+  });
 
-    // Función para autocompletar
-    function setupAutocomplete(inputEl, listEl) {
-      inputEl.addEventListener("input", () => {
-        const val = inputEl.value.toLowerCase();
-        listEl.innerHTML = "";
-        if (!val) return;
+  // Función para autocompletar
+  function setupAutocomplete(inputEl, listEl) {
+    inputEl.addEventListener("input", () => {
+      const val = inputEl.value.toLowerCase();
+      listEl.innerHTML = "";
+      if (!val) return;
 
-        const filtered = productos.filter(p => p.toLowerCase().includes(val));
+      const filtered = productos
+        .map(p => p.nombre)
+        .filter(nombre => nombre.toLowerCase().includes(val));
 
-        filtered.forEach(item => {
-          const div = document.createElement("div");
-          div.classList.add("autocomplete-item");
-          div.textContent = item;
-          div.onclick = () => {
-            inputEl.value = item;
-            listEl.innerHTML = "";
-            updateTotal();
-          };
-          listEl.appendChild(div);
-        });
-      });
-
-      // Cerrar lista si se hace click fuera
-      document.addEventListener("click", e => {
-        if (e.target !== inputEl) {
+      filtered.forEach(item => {
+        const div = document.createElement("div");
+        div.classList.add("autocomplete-item");
+        div.textContent = item;
+        div.onclick = () => {
+          inputEl.value = item;
           listEl.innerHTML = "";
-        }
-      });
-    }
-
-    // Calcular total
-    function updateTotal() {
-      let total = 0;
-      for (let i = 0; i <= 5; i++) {
-        const prod = document.getElementById("producto" + i).value;
-        const qty = parseInt(document.getElementById("cantidad" + i).value) || 0;
-        if (prod && precios[prod]) {
-          total += precios[prod] * qty;
-        }
-      }
-      document.getElementById("total").textContent = "$" + total.toFixed(2);
-      return total;
-    }
-
-    // Configurar autocompletado en todos los inputs de producto
-    for (let i = 0; i <= 5; i++) {
-      setupAutocomplete(
-        document.getElementById("producto" + i),
-        document.getElementById("list" + i)
-      );
-      // Actualizar total si cambian cantidades
-      document.getElementById("cantidad" + i).addEventListener("input", updateTotal);
-      document.getElementById("producto" + i).addEventListener("change", updateTotal);
-    }
-
-    // Enviar datos al backend
-    document.getElementById("cajaForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const msgEl = document.getElementById("msg");
-      msgEl.textContent = "";
-      msgEl.className = "";
-
-      // Validar campo obligatorio producto0 y cantidad0
-      const prod0 = document.getElementById("producto0").value.trim();
-      const qty0 = parseInt(document.getElementById("cantidad0").value);
-      if (!prod0 || qty0 < 1) {
-        msgEl.textContent = "El primer producto y cantidad son obligatorios y válidos.";
-        msgEl.className = "error";
-        return;
-      }
-
-      // Construir lista de productos vendidos
-      const vendidos = [];
-      for (let i = 0; i <=5; i++) {
-        const p = document.getElementById("producto" + i).value.trim();
-        const q = parseInt(document.getElementById("cantidad" + i).value);
-        if (p && q > 0) {
-          vendidos.push({ producto: p, cantidad: q });
-        }
-      }
-
-      const total = updateTotal();
-
-      // Datos a enviar
-      const dataToSend = {
-        vendidos,
-        total
-      };
-
-      // Aquí va la URL de tu API en Render (placeholder)
-      const API_URL = "https://tu-api-en-render.onrender.com/ventas";
-
-      fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend)
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("Error en el servidor");
-        return res.json();
-      })
-      .then(data => {
-        msgEl.textContent = "Venta registrada correctamente.";
-        msgEl.className = "success";
-        // Reset form
-        document.getElementById("cajaForm").reset();
-        updateTotal();
-      })
-      .catch(err => {
-        msgEl.textContent = "Error al registrar la venta: " + err.message;
-        msgEl.className = "error";
+          updateTotal();
+        };
+        listEl.appendChild(div);
       });
     });
 
-    // Inicializar total en 0
-    updateTotal();
+    // Cerrar lista si se hace click fuera
+    document.addEventListener("click", e => {
+      if (e.target !== inputEl) {
+        listEl.innerHTML = "";
+      }
+    });
+  }
 
-  </script>
+  // Calcular total
+  function updateTotal() {
+    let total = 0;
+    for (let i = 0; i <= 5; i++) {
+      const prodInput = document.getElementById("producto" + i);
+      const prod = prodInput.value.trim().toLowerCase();
+      const qty = parseInt(document.getElementById("cantidad" + i).value) || 0;
+
+      if (prod && nombreACodigo.hasOwnProperty(prod) && qty > 0) {
+        const codigo = nombreACodigo[prod];
+        total += codigoAPrecio[codigo] * qty;
+
+        // Limpia estilos si antes había error
+        prodInput.style.borderColor = "";
+      } else {
+        // Marca rojo si texto no existe en lista
+        if (prod) {
+          prodInput.style.borderColor = "red";
+        } else {
+          prodInput.style.borderColor = "";
+        }
+      }
+    }
+    document.getElementById("total").textContent = "$" + total.toFixed(2);
+    return total;
+  }
+
+  // Agrupa productos repetidos sumando cantidades
+  function agruparProductos(vendidos) {
+    const agrupados = {};
+    vendidos.forEach(item => {
+      if (agrupados[item.codigo]) {
+        agrupados[item.codigo] += item.cantidad;
+      } else {
+        agrupados[item.codigo] = item.cantidad;
+      }
+    });
+    return Object.entries(agrupados).map(([codigo, cantidad]) => ({
+      codigo: Number(codigo),
+      cantidad
+    }));
+  }
+
+  // Configurar autocompletado en inputs
+  for (let i = 0; i <= 5; i++) {
+    setupAutocomplete(
+      document.getElementById("producto" + i),
+      document.getElementById("list" + i)
+    );
+
+    document.getElementById("cantidad" + i).addEventListener("input", updateTotal);
+    document.getElementById("producto" + i).addEventListener("change", updateTotal);
+  }
+
+  // Enviar datos al backend
+  document.getElementById("cajaForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const msgEl = document.getElementById("msg");
+    msgEl.textContent = "";
+    msgEl.className = "";
+
+    // Validar campo obligatorio producto0 y cantidad0
+    const prod0 = document.getElementById("producto0").value.trim().toLowerCase();
+    const qty0 = parseInt(document.getElementById("cantidad0").value);
+    if (!prod0 || qty0 < 1 || !nombreACodigo[prod0]) {
+      msgEl.textContent = "El primer producto y cantidad son obligatorios y válidos.";
+      msgEl.className = "error";
+      return;
+    }
+
+    // Construir lista de productos vendidos con código y cantidad
+    const vendidosRaw = [];
+    for (let i = 0; i <= 5; i++) {
+      const prod = document.getElementById("producto" + i).value.trim().toLowerCase();
+      const qty = parseInt(document.getElementById("cantidad" + i).value);
+      if (prod && qty > 0 && nombreACodigo[prod]) {
+        vendidosRaw.push({
+          codigo: nombreACodigo[prod],
+          cantidad: qty
+        });
+      }
+    }
+
+    // Agrupar productos repetidos sumando cantidades
+    const vendidos = agruparProductos(vendidosRaw);
+
+    // Calcular total (por seguridad, backend debe recalcular)
+    const total = vendidos.reduce((acc, item) => {
+      return acc + (codigoAPrecio[item.codigo] * item.cantidad);
+    }, 0);
+
+    const dataToSend = {
+      vendidos,
+      total
+    };
+
+    // Cambia por la URL real de tu API en Render
+    const API_URL = "https://tu-api-en-render.onrender.com/ventas";
+
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dataToSend)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Error en el servidor");
+      return res.json();
+    })
+    .then(data => {
+      msgEl.textContent = "Venta registrada correctamente.";
+      msgEl.className = "success";
+      document.getElementById("cajaForm").reset();
+      updateTotal();
+    })
+    .catch(err => {
+      msgEl.textContent = "Error al registrar la venta: " + err.message;
+      msgEl.className = "error";
+    });
+  });
+
+  // Inicializar total en 0
+  updateTotal();
+
+</script>
+
 </body>
 </html>
