@@ -179,7 +179,7 @@
       color: #188038;
     }
     
-    @media (max-width: 600px) {
+  @media (max-width: 600px) {
   .item-row {
     flex-direction: column;
     align-items: stretch;
@@ -190,18 +190,19 @@
     margin-bottom: 0.5rem;
   }
 
-  .inputs-derecha {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-start;
+  /* Para que el input cantidad ocupe el mismo ancho que producto */
+  #cantidadInput {
+    flex: 1 1 100%;
+    max-width: 100%;
+    margin-bottom: 0.5rem;
   }
 
-  #cantidad {
-    flex: 0 0 80px;
-  }
-
-  .mini-button {
-    flex: 1;
+  /* Botón agregar centrado y con ancho */
+  #agregarBtn {
+    width: 100%;
+    max-width: 300px; /* o lo que prefieras */
+    margin: 0 auto;
+    display: block;
   }
 }
   </style>
