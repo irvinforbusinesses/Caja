@@ -82,12 +82,6 @@
       border-color: var(--input-focus-border);
     }
 
-      footer {
-  margin-top: 2rem;
-  text-align: center;
-  color: #888;
-  font-size: 0.8rem;
-}
     input[type="number"] {
       max-width: 90px;
       text-align: center;
@@ -135,6 +129,9 @@
       max-height: 220px;
       overflow-y: auto;
       margin-top: 1rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
     .total-container {
@@ -184,104 +181,114 @@
     #msg.success {
       color: #188038;
     }
-    
-  @media (max-width: 600px) {
-  .item-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0;
-  }
 
-  .autocomplete-container {
-    width: 100%;
-    margin-bottom: 0;
-  }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: #888;
+      font-size: 0.8rem;
+    }
 
-  #cantidad {
-    width: 140px;
-    max-width: 50%;
-    text-align: center;
-    margin: 0 auto;
-  }
+    @media (max-width: 600px) {
+      .item-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0;
+      }
 
-  #agregarBtn,
-  .mini-button {
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
-    display: block;
-    background-color: var(--color-accent);
-    color: var(--color-light);
-    padding: 0.75rem;
-    border-radius: 6px;
-    border: none;
-    font-weight: bold;
-    font-family: 'Poppins', sans-serif;
-  }
+      .autocomplete-container {
+        width: 100%;
+        margin-bottom: 0;
+      }
 
-  .scrollable {
-    max-height: calc(44px * 5); /* hasta 5 filas */
-    overflow-y: auto;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-top: 1rem;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-  }
+      #cantidad {
+        width: 140px;
+        max-width: 50%;
+        text-align: center;
+        margin: 0 auto;
+        font-size: 16px;
+      }
 
-  form {
-    padding: 0;
-    background: none;
-    box-shadow: none;
-  }
-}
+      #agregarBtn,
+      .mini-button {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+        display: block;
+        background-color: var(--color-accent);
+        color: var(--color-light);
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: none;
+        font-weight: bold;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      .scrollable {
+        max-height: 220px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-top: 1rem;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      form {
+        padding: 0;
+        background: none;
+        box-shadow: none;
+      }
+
+      input {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="container">
-  <div class="container">
-    <h1>Caja Virtual</h1>
-    <form id="ventaForm">
-      <div class="item-row">
-        <div class="autocomplete-container">
-          <input type="text" id="producto" placeholder="Producto" />
-          <div class="autocomplete-list" id="list"></div>
+      <h1>Caja Virtual</h1>
+      <form id="ventaForm">
+        <div class="item-row">
+          <div class="autocomplete-container">
+            <input type="text" id="producto" placeholder="Producto" />
+            <div class="autocomplete-list" id="list"></div>
+          </div>
+          <input type="number" id="cantidad" placeholder="Cant." min="1" />
+          <button type="button" class="mini-button" onclick="agregarProducto()">Agregar</button>
         </div>
-        <input type="number" id="cantidad" placeholder="Cant." min="1" value="1" />
-        <button type="button" class="mini-button" onclick="agregarProducto()">Agregar</button>
-      </div>
 
-      <div class="scrollable">
-        <table id="tablaVenta">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Cantidad</th>
-              <th>Precio</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+        <div class="scrollable">
+          <table id="tablaVenta">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
 
-      <div class="total-container">
-        <div>Total:</div>
-        <div id="total">$0.00</div>
-      </div>
+        <div class="total-container">
+          <div>Total:</div>
+          <div id="total">$0.00</div>
+        </div>
 
-      <button type="submit">Registrar Venta</button>
-      <div id="msg"></div>
-    </form>
-  </div>
-   </body> 
-  <footer>
+        <button type="submit">Registrar Venta</button>
+        <div id="msg"></div>
+      </form>
+    </div>
+    <footer>
       <p>&copy; 2025. Irvin Prado. Ascende Superious - Busca Cosas Superiores.</p>
     </footer>
   </div>
-  
-
 
   <script>
     const productos = [
@@ -342,7 +349,6 @@
 
       if (!codigo) return;
 
-      // Si ya existe, suma cantidades
       const existente = venta.find(p => p.codigo === codigo);
       if (existente) {
         existente.cantidad += cantidad;
@@ -351,7 +357,7 @@
       }
 
       document.getElementById("producto").value = "";
-      document.getElementById("cantidad").value = 1;
+      document.getElementById("cantidad").value = "";
       renderTabla();
     }
 
@@ -418,6 +424,13 @@
     });
 
     setupAutocomplete();
+
+    const cantidadInput = document.getElementById("cantidad");
+    if (window.innerWidth <= 600) {
+      cantidadInput.placeholder = "Cant.";
+    } else {
+      cantidadInput.placeholder = "Cantidad";
+    }
   </script>
 </body>
 </html>
