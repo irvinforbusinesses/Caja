@@ -33,14 +33,32 @@ app.get('/', (req, res) => {
   res.send('Servidor corriendo y conectado a Supabase!');
 });
 
-// Ruta para registrar ventas (por si ya la tienes lista)
+// Ruta para registrar ventas
 app.post('/', async (req, res) => {
-  const { cliente, total } = req.body;
+  const { vendidos } = req.body;
+
+  if (!vendidos || !Array.isArray(vendidos) || vendidos.length === 0) {
+    return res.status(400).json({ error: 'La lista de productos vendidos es obligatoria' });
+  }
+
+  // Fecha y hora actuales en formato adecuado
+  const now = new Date();
+  const fecha = now.toISOString().slice(0, 10); // YYYY-MM-DD
+  const hora = now.toTimeString().slice(0, 8);  // HH:MM:SS
 
   try {
+    // Preparar filas para insertar, con los campos correctos según tu tabla
+    const filas = vendidos.map(item => ({
+      producto_id: item.codigo,
+      cantidad: item.cantidad,
+      fecha,
+      hora
+    }));
+
+    // Insertar múltiples filas
     const { data, error } = await supabase
       .from('ventas')
-      .insert([{ cliente, total }]);
+      .insert(filas);
 
     if (error) throw error;
 
