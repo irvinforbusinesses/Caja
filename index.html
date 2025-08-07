@@ -178,6 +178,32 @@
     #msg.success {
       color: #188038;
     }
+    
+    @media (max-width: 600px) {
+  .item-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .autocomplete-container {
+    flex: 1 1 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .inputs-derecha {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+  }
+
+  #cantidad {
+    flex: 0 0 80px;
+  }
+
+  .mini-button {
+    flex: 1;
+  }
+}
   </style>
 </head>
 <body>
