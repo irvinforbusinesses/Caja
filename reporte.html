@@ -58,7 +58,12 @@
     .comparativo.negativo {
       color: #d93025;
     }
-
+     footer {
+  font-size: 0.65rem;
+  padding: 0.5rem 1rem;
+  line-height: 1.2;
+  text-align: center;
+}
     .boton-mostrar {
       text-align: center;
       margin-bottom: 30px;
@@ -138,7 +143,10 @@
     <div id="chart-tendencia" class="grafico" title="Tendencia Acumulada"></div>
     <div id="chart-heatmap" class="grafico" title="Ventas por Día de la Semana"></div>
   </div>
-
+   <footer>
+      <p>&copy; 2025. Irvin Prado. Ascende Superious - Busca Cosas Superiores.</p>
+    </footer>
+    </div>
   <script>
     const { createClient } = supabase;
     const supabaseClient = createClient(
