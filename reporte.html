@@ -35,11 +35,15 @@
       max-width: 240px;
       text-align: center;
       user-select: none;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+      position: relative;
     }
-    .tarjeta h3 {
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #003366;
+    .tarjeta:hover {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    .tarjeta.filtrado {
+      box-shadow: 0 0 0 3px #007bff;
     }
     .valor {
       font-size: 2rem;
@@ -58,12 +62,12 @@
     .comparativo.negativo {
       color: #d93025;
     }
-     footer {
-  font-size: 0.65rem;
-  padding: 0.5rem 1rem;
-  line-height: 1.2;
-  text-align: center;
-}
+    footer {
+      font-size: 0.65rem;
+      padding: 0.5rem 1rem;
+      line-height: 1.2;
+      text-align: center;
+    }
     .boton-mostrar {
       text-align: center;
       margin-bottom: 30px;
@@ -82,7 +86,6 @@
     .boton-mostrar button:hover {
       background-color: #0056b3;
     }
-
     .graficos {
       max-width: 960px;
       margin: 0 auto 60px;
@@ -96,8 +99,13 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       height: 380px;
       user-select: none;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+      position: relative;
     }
-
+    .grafico.filtrado {
+      box-shadow: 0 0 0 3px #007bff;
+    }
     /* Responsive mobile */
     @media (max-width: 768px) {
       .graficos {
@@ -116,17 +124,17 @@
   <h1>Dashboard de Ventas Avanzado</h1>
 
   <div class="resumen" id="resumen-tarjetas">
-    <div class="tarjeta" id="tarjeta-total-cantidad">
+    <div class="tarjeta" id="tarjeta-total-cantidad" title="Filtrar por último día (Total productos vendidos)">
       <h3>Total Productos Vendidos</h3>
       <div class="valor" id="total-cantidad">0</div>
       <div class="comparativo" id="comp-cantidad"></div>
     </div>
-    <div class="tarjeta" id="tarjeta-total-ingresos">
+    <div class="tarjeta" id="tarjeta-total-ingresos" title="Filtrar por último día (Total ingresos)">
       <h3>Total Ingresos</h3>
       <div class="valor" id="total-dinero">$0.00</div>
       <div class="comparativo" id="comp-ingresos"></div>
     </div>
-    <div class="tarjeta" id="tarjeta-tendencia-producto">
+    <div class="tarjeta" id="tarjeta-tendencia-producto" title="Filtrar por producto en tendencia">
       <h3>Producto en Tendencia ↑</h3>
       <div class="valor" id="producto-tendencia">-</div>
       <div class="comparativo" id="comp-producto-tendencia"></div>
@@ -143,9 +151,9 @@
     <div id="chart-tendencia" class="grafico" title="Tendencia Acumulada"></div>
     <div id="chart-heatmap" class="grafico" title="Ventas por Día de la Semana"></div>
   </div>
-   <footer>
-      <p>&copy; 2025. Irvin Prado. Ascende Superious - Busca Cosas Superiores.</p>
-    </footer>
+  <footer>
+    <p>&copy; 2025. Irvin Prado. Ascende Superious - Busca Cosas Superiores.</p>
+  </footer>
   <script>
     const { createClient } = supabase;
     const supabaseClient = createClient(
@@ -154,7 +162,7 @@
     );
 
     let datosOriginales = [];
-    let filtroActivo = null; // { tipo: 'fecha'|'producto'|'diaSemana', valor: string }
+    let filtroActivo = null; // { tipo: 'fecha'|'producto'|'diaSemana', valor: string|number }
 
     const diasSemanaNombres = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
 
@@ -311,6 +319,24 @@
         compProdTendEl.textContent = '-';
         compProdTendEl.className = 'comparativo';
       }
+
+      // Marca visual para filtro activo en tarjetas resumen
+      document.querySelectorAll('.tarjeta').forEach(tarjeta => {
+        tarjeta.classList.remove('filtrado');
+      });
+      if (filtroActivo) {
+        if (filtroActivo.tipo === 'producto') {
+          if (filtroActivo.valor === tendencia.nombre) {
+            document.getElementById('tarjeta-tendencia-producto').classList.add('filtrado');
+          }
+        }
+        if (filtroActivo.tipo === 'fecha') {
+          // Marcar tarjetas de total cantidad e ingresos (que filtran por último día)
+          // Por simplicidad marcar ambas
+          document.getElementById('tarjeta-total-cantidad').classList.add('filtrado');
+          document.getElementById('tarjeta-total-ingresos').classList.add('filtrado');
+        }
+      }
     }
 
     let chartLinea, chartBarras, chartTendencia, chartHeatmap;
@@ -338,6 +364,19 @@
         grid: { bottom: 60 },
       };
       chartLinea.setOption(option);
+
+      // Interactividad clic en línea: filtrar por fecha
+      chartLinea.off('click');
+      chartLinea.on('click', params => {
+        if (params.componentType === 'xAxis') return; // Ignorar click en eje
+        if (params.componentType === 'series') {
+          filtroActivo = { tipo: 'fecha', valor: params.name };
+          const datosFiltrados = filtrarDatos(datosOriginales, filtroActivo);
+          actualizarTarjetas(datosFiltrados);
+          actualizarGraficos(datosFiltrados);
+          marcarGraficoFiltrado(chartLinea);
+        }
+      });
     }
 
     function dibujarGraficoBarras(data) {
@@ -368,29 +407,45 @@
             itemStyle: { color: colors[i] }
           })),
           type: 'bar',
-          name: 'Cantidad'
-        }],
-        grid: { bottom: 60 },
+          name: 'Cantidad',
+          barMaxWidth: 50,
+        }]
       };
       chartBarras.setOption(option);
+
+      // Interactividad clic en barra: filtrar por producto
+      chartBarras.off('click');
+      chartBarras.on('click', params => {
+        if (params.componentType === 'series') {
+          filtroActivo = { tipo: 'producto', valor: params.name };
+          const datosFiltrados = filtrarDatos(datosOriginales, filtroActivo);
+          actualizarTarjetas(datosFiltrados);
+          actualizarGraficos(datosFiltrados);
+          marcarGraficoFiltrado(chartBarras);
+        }
+      });
     }
 
     function dibujarGraficoTendencia(data) {
-      const porDia = {};
-      data.forEach(item => {
-        if (!porDia[item.fechaKey]) porDia[item.fechaKey] = { ingresos: 0, cantidad: 0 };
-        porDia[item.fechaKey].ingresos += item.cantidad * item.precio;
-        porDia[item.fechaKey].cantidad += item.cantidad;
+      const fechas = [...new Set(data.map(d => d.fechaKey))].sort();
+      const porDia = fechas.map(f => {
+        const subset = data.filter(d => d.fechaKey === f);
+        return {
+          fecha: f,
+          ingresos: subset.reduce((a,b) => a + b.cantidad*b.precio,0),
+          cantidad: subset.reduce((a,b) => a + b.cantidad,0)
+        };
       });
-      const fechas = Object.keys(porDia).sort();
 
       let acumuladoIngresos = 0;
       let acumuladoCantidad = 0;
       const ingresosAcum = [];
       const cantidadAcum = [];
+
       fechas.forEach(f => {
-        acumuladoIngresos += porDia[f].ingresos;
-        acumuladoCantidad += porDia[f].cantidad;
+        const obj = porDia.find(d => d.fecha === f);
+        acumuladoIngresos += obj.ingresos;
+        acumuladoCantidad += obj.cantidad;
         ingresosAcum.push(acumuladoIngresos);
         cantidadAcum.push(acumuladoCantidad);
       });
@@ -399,8 +454,7 @@
         title: { text: 'Tendencia Acumulada (Ingresos y Cantidad)' },
         tooltip: { trigger: 'axis', formatter: params => {
           const d = params[0];
-          const dateStr = d.axisValue.split('-').reverse().join('/');
-          return `${dateStr}<br/>Ingresos: $${params[0].data.toFixed(2)}<br/>Cantidad: ${params[1].data}`;
+          return `${d.axisValue.split('-').reverse().join('/')}<br/>Ingresos: $${params[0].data.toFixed(2)}<br/>Cantidad: ${params[1].data}`;
         }},
         legend: { data: ['Ingresos', 'Cantidad'] },
         xAxis: {
@@ -433,119 +487,158 @@
         grid: { bottom: 90 }
       };
       chartTendencia.setOption(option);
+
+      // Interactividad clic: filtrar por fecha (sobre cualquiera de las dos series)
+      chartTendencia.off('click');
+      chartTendencia.on('click', params => {
+        if (params.componentType === 'series' || params.componentType === 'xAxis') {
+          filtroActivo = { tipo: 'fecha', valor: params.name };
+          const datosFiltrados = filtrarDatos(datosOriginales, filtroActivo);
+          actualizarTarjetas(datosFiltrados);
+          actualizarGraficos(datosFiltrados);
+          marcarGraficoFiltrado(chartTendencia);
+        }
+      });
     }
 
     function dibujarGraficoHeatmap(data) {
+      // Cambiado a gráfico de barras: Ventas por Día de la Semana
       const ventasPorDiaSemana = [0,0,0,0,0,0,0];
       data.forEach(item => {
         ventasPorDiaSemana[item.diaSemana] += item.cantidad;
       });
 
       const option = {
-        title: { text: 'Ventas por Día de la Semana' },
-        tooltip: { formatter: params => `${diasSemanaNombres[params.data[0]]}: ${params.data[1]} productos` },
+        title: { text: 'Ventas por Día de la Semana (Barras)' },
+        tooltip: { 
+          trigger: 'axis',
+          formatter: params => {
+            const p = params[0];
+            return `${diasSemanaNombres[p.dataIndex]}: ${p.data} productos`;
+          }
+        },
         xAxis: {
           type: 'category',
           data: diasSemanaNombres,
           axisLabel: { rotate: 30 }
         },
-        yAxis: { show: false },
-        visualMap: {
-          min: 0,
-          max: Math.max(...ventasPorDiaSemana),
-          calculable: true,
-          orient: 'horizontal',
-          left: 'center',
-          bottom: 20
+        yAxis: {
+          type: 'value',
+          name: 'Cantidad',
         },
         series: [{
-          type: 'heatmap',
-          data: ventasPorDiaSemana.map((v,i) => [i,v]),
-          label: { show: true },
-          emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
+          type: 'bar',
+          data: ventasPorDiaSemana,
+          itemStyle: {
+            color: '#5470c6'
+          },
+          name: 'Cantidad de Ventas',
+          barMaxWidth: 50
         }]
       };
       chartHeatmap.setOption(option);
-    }
 
-    function aplicarFiltro(tipo, valor) {
-      filtroActivo = { tipo, valor };
-      let datosFiltrados;
-      switch(tipo) {
-        case 'fecha':
-          datosFiltrados = datosOriginales.filter(d => d.fechaKey === valor);
-          break;
-        case 'producto':
-          datosFiltrados = datosOriginales.filter(d => d.nombre === valor);
-          break;
-        case 'diaSemana':
-          datosFiltrados = datosOriginales.filter(d => d.diaSemana === valor);
-          break;
-        default:
-          datosFiltrados = datosOriginales;
-      }
-      actualizarTarjetas(datosFiltrados);
-      dibujarGraficoLinea(datosFiltrados);
-      dibujarGraficoBarras(datosFiltrados);
-      dibujarGraficoTendencia(datosFiltrados);
-      dibujarGraficoHeatmap(datosFiltrados);
-    }
-
-    function limpiarFiltro() {
-      filtroActivo = null;
-      actualizarTarjetas(datosOriginales);
-      dibujarGraficoLinea(datosOriginales);
-      dibujarGraficoBarras(datosOriginales);
-      dibujarGraficoTendencia(datosOriginales);
-      dibujarGraficoHeatmap(datosOriginales);
-    }
-
-    function agregarInteractividad() {
-      chartLinea.on('click', params => {
-        if (filtroActivo && filtroActivo.tipo === 'fecha' && filtroActivo.valor === params.name) {
-          limpiarFiltro();
-        } else {
-          aplicarFiltro('fecha', params.name);
-        }
-      });
-      chartBarras.on('click', params => {
-        if (filtroActivo && filtroActivo.tipo === 'producto' && filtroActivo.valor === params.name) {
-          limpiarFiltro();
-        } else {
-          aplicarFiltro('producto', params.name);
-        }
-      });
+      // Interactividad clic en barra: filtrar por día de la semana (0=Domingo..6=Sábado)
+      chartHeatmap.off('click');
       chartHeatmap.on('click', params => {
-        const dia = params.data[0];
-        if (filtroActivo && filtroActivo.tipo === 'diaSemana' && filtroActivo.valor === dia) {
-          limpiarFiltro();
-        } else {
-          aplicarFiltro('diaSemana', dia);
+        if (params.componentType === 'series') {
+          filtroActivo = { tipo: 'diaSemana', valor: params.dataIndex };
+          const datosFiltrados = filtrarDatos(datosOriginales, filtroActivo);
+          actualizarTarjetas(datosFiltrados);
+          actualizarGraficos(datosFiltrados);
+          marcarGraficoFiltrado(chartHeatmap);
         }
-      });
-
-      document.getElementById('btn-mostrar-todo').addEventListener('click', () => {
-        limpiarFiltro();
       });
     }
 
-    async function iniciarDashboard() {
-      datosOriginales = await cargarDatos();
-
+    function inicializarGraficos() {
       chartLinea = echarts.init(document.getElementById('chart-linea'));
       chartBarras = echarts.init(document.getElementById('chart-barras'));
       chartTendencia = echarts.init(document.getElementById('chart-tendencia'));
       chartHeatmap = echarts.init(document.getElementById('chart-heatmap'));
-
-      actualizarTarjetas(datosOriginales);
-      dibujarGraficoLinea(datosOriginales);
-      dibujarGraficoBarras(datosOriginales);
-      dibujarGraficoTendencia(datosOriginales);
-      dibujarGraficoHeatmap(datosOriginales);
-      agregarInteractividad();
     }
 
-    window.onload = iniciarDashboard;
+    function actualizarGraficos(data) {
+      dibujarGraficoLinea(data);
+      dibujarGraficoBarras(data);
+      dibujarGraficoTendencia(data);
+      dibujarGraficoHeatmap(data);
+
+      // Marca visual en gráficos segun filtro activo
+      marcarGraficoFiltrado(null); // resetea todos
+    }
+
+    function filtrarDatos(data, filtro) {
+      if (!filtro) return data;
+      if (filtro.tipo === 'fecha') {
+        return data.filter(d => d.fechaKey === filtro.valor);
+      } else if (filtro.tipo === 'producto') {
+        return data.filter(d => d.nombre === filtro.valor);
+      } else if (filtro.tipo === 'diaSemana') {
+        return data.filter(d => d.diaSemana === filtro.valor);
+      }
+      return data;
+    }
+
+    function marcarGraficoFiltrado(graficoFiltrado) {
+      // Remover clase filtrado de todos gráficos
+      [chartLinea, chartBarras, chartTendencia, chartHeatmap].forEach(c => {
+        c.getDom().classList.remove('filtrado');
+      });
+      if (graficoFiltrado) {
+        graficoFiltrado.getDom().classList.add('filtrado');
+      }
+    }
+
+    async function inicializarDashboard() {
+      datosOriginales = await cargarDatos();
+      inicializarGraficos();
+      actualizarTarjetas(datosOriginales);
+      actualizarGraficos(datosOriginales);
+    }
+
+    // Interactividad tarjetas resumen
+    document.getElementById('tarjeta-tendencia-producto').addEventListener('click', () => {
+      const nombreProd = document.getElementById('producto-tendencia').textContent;
+      if (nombreProd && nombreProd !== '-') {
+        filtroActivo = { tipo: 'producto', valor: nombreProd };
+        const datosFiltrados = filtrarDatos(datosOriginales, filtroActivo);
+        actualizarTarjetas(datosFiltrados);
+        actualizarGraficos(datosFiltrados);
+        marcarGraficoFiltrado(null);
+      }
+    });
+
+    document.getElementById('tarjeta-total-cantidad').addEventListener('click', () => {
+      const fechas = [...new Set(datosOriginales.map(d => d.fechaKey))].sort();
+      if (fechas.length > 0) {
+        filtroActivo = { tipo: 'fecha', valor: fechas[fechas.length - 1] };
+        const datosFiltrados = filtrarDatos(datosOriginales, filtroActivo);
+        actualizarTarjetas(datosFiltrados);
+        actualizarGraficos(datosFiltrados);
+        marcarGraficoFiltrado(null);
+      }
+    });
+
+    document.getElementById('tarjeta-total-ingresos').addEventListener('click', () => {
+      const fechas = [...new Set(datosOriginales.map(d => d.fechaKey))].sort();
+      if (fechas.length > 0) {
+        filtroActivo = { tipo: 'fecha', valor: fechas[fechas.length - 1] };
+        const datosFiltrados = filtrarDatos(datosOriginales, filtroActivo);
+        actualizarTarjetas(datosFiltrados);
+        actualizarGraficos(datosFiltrados);
+        marcarGraficoFiltrado(null);
+      }
+    });
+
+    document.getElementById('btn-mostrar-todo').addEventListener('click', () => {
+      filtroActivo = null;
+      actualizarTarjetas(datosOriginales);
+      actualizarGraficos(datosOriginales);
+      marcarGraficoFiltrado(null);
+    });
+
+    window.onload = inicializarDashboard;
   </script>
 </body>
 </html>
