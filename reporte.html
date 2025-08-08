@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard de Ventas</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .resumen {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    .tarjeta {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      min-width: 200px;
+      text-align: center;
+    }
+    .graficos {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .grafico {
+      width: 100%;
+      height: 400px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .boton-mostrar {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .boton-mostrar button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard de Ventas</h1>
+
+  <div class="resumen">
+    <div class="tarjeta">
+      <h3>Total Productos Vendidos</h3>
+      <p id="total-cantidad">0</p>
+    </div>
+    <div class="tarjeta">
+      <h3>Total Ingresos</h3>
+      <p id="total-dinero">$0.00</p>
+    </div>
+  </div>
+
+  <div class="boton-mostrar">
+    <button onclick="mostrarTodo()">Mostrar todo</button>
+  </div>
+
+  <div class="graficos">
+    <div id="chart-linea" class="grafico"></div>
+    <div id="chart-barras" class="grafico"></div>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      'https://akqttyqqfkspfvnbfcox.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrcXR0eXFxZmtzcGZ2bmJmY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MDk1MDAsImV4cCI6MjA3MDA4NTUwMH0.9MLYC25EGp25YFkdwOqN-gdgu3k_JBCDW6y6qKtSy6k'
+    );
+
+    let datosOriginales = [];
+
+    async function cargarDatos() {
+      try {
+        const { data: ventas, error: errorVentas } = await supabaseClient
+          .from('ventas')
+          .select('producto_id, cantidad, fecha');
+
+        if (errorVentas) throw errorVentas;
+
+        const { data: productos, error: errorProductos } = await supabaseClient
+          .from('Producto')
+          .select('id, Producto, Precio');
+
+        if (errorProductos) throw errorProductos;
+        if (!Array.isArray(productos)) throw new Error("Formato inesperado de productos");
+
+        const mapaProductos = {};
+        productos.forEach(p => {
+          mapaProductos[p.id] = { nombre: p.Producto, precio: p.Precio };
+        });
+
+        const ventasEnriquecidas = ventas.map(v => {
+          const prod = mapaProductos[v.producto_id];
+          return {
+            ...v,
+            nombre: prod ? prod.nombre : 'Desconocido',
+            precio: prod ? prod.precio : 0
+          };
+        });
+
+        return ventasEnriquecidas;
+      } catch (err) {
+        console.error("Error al cargar productos y ventas:", err);
+        alert("Error al cargar datos. Ver consola para más detalles.");
+        return [];
+      }
+    }
+
+    function actualizarTotales(data) {
+      const totalCantidad = data.reduce((sum, v) => sum + v.cantidad, 0);
+      const totalDinero = data.reduce((sum, v) => sum + v.cantidad * v.precio, 0);
+
+      document.getElementById('total-cantidad').textContent = totalCantidad;
+      document.getElementById('total-dinero').textContent = `$${totalDinero.toFixed(2)}`;
+    }
+
+    function dibujarGraficoLinea(data) {
+      const chart = echarts.init(document.getElementById('chart-linea'));
+      const ventasPorDia = {};
+
+      data.forEach(item => {
+        const fecha = new Date(item.fecha).toLocaleDateString();
+        ventasPorDia[fecha] = (ventasPorDia[fecha] || 0) + item.cantidad * item.precio;
+      });
+
+      const fechas = Object.keys(ventasPorDia).sort((a, b) => new Date(a) - new Date(b));
+
+      chart.setOption({
+        title: { text: 'Ingresos por Día' },
+        tooltip: {},
+        xAxis: { type: 'category', data: fechas },
+        yAxis: { type: 'value' },
+        series: [{ data: fechas.map(f => ventasPorDia[f]), type: 'line' }]
+      });
+    }
+
+    function dibujarGraficoBarras(data) {
+      const chart = echarts.init(document.getElementById('chart-barras'));
+      const ventasPorProducto = {};
+
+      data.forEach(item => {
+        ventasPorProducto[item.nombre] = (ventasPorProducto[item.nombre] || 0) + item.cantidad;
+      });
+
+      const productos = Object.keys(ventasPorProducto);
+      const cantidades = productos.map(p => ventasPorProducto[p]);
+
+      chart.setOption({
+        title: { text: 'Productos Más Vendidos' },
+        tooltip: {},
+        xAxis: {
+          type: 'category',
+          data: productos,
+          axisLabel: { interval: 0, rotate: 30 }
+        },
+        yAxis: { type: 'value' },
+        series: [{ data: cantidades, type: 'bar' }]
+      });
+    }
+
+    function mostrarTodo() {
+      actualizarTotales(datosOriginales);
+      dibujarGraficoLinea(datosOriginales);
+      dibujarGraficoBarras(datosOriginales);
+    }
+
+    cargarDatos().then(data => {
+      datosOriginales = data;
+      mostrarTodo();
+    });
+  </script>
+</body>
+</html>
