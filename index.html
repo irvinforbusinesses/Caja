@@ -201,7 +201,7 @@
         padding: 0.5rem 1rem;
         line-height: 1.2;
       }
-      
+
       .autocomplete-container {
         width: 100%;
         margin-bottom: 0;
@@ -252,39 +252,51 @@
       }
     }
 
-    /* Popup styles */
-    #popup-overlay {
-      display: none;
+    /* Shared popup overlay with fade */
+    .popup-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.4);
-      z-index: 1500;
+      display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Poppins', sans-serif;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 220ms ease, visibility 220ms ease, transform 220ms ease;
+    }
+    .popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
 
-    #popup-box {
+    /* Popup box */
+    #popup-box, #popup-cancel-box {
       background: var(--color-light);
       padding: 2rem 2.5rem;
       border-radius: 12px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
       text-align: center;
-      width: 300px;
+      width: 320px;
       max-width: 90vw;
       color: var(--color-text-dark);
+      transform: translateY(6px);
+      transition: transform 220ms ease, opacity 220ms ease;
+    }
+    .popup-overlay.show #popup-box,
+    .popup-overlay.show #popup-cancel-box {
+      transform: translateY(0);
     }
 
     #popup-message {
       font-size: 1.1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
-    #popup-spinner {
-      margin-bottom: 1.5rem;
-    }
-
-    #popup-spinner div {
+    /* Spinner style */
+    .spinner {
       width: 40px;
       height: 40px;
       margin: 0 auto;
@@ -292,6 +304,11 @@
       border-top: 4px solid var(--color-accent);
       border-radius: 50%;
       animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     #popup-close-btn {
@@ -311,28 +328,9 @@
       background-color: var(--button-hover);
     }
 
-    /* Popup Cancelar Venta styles */
-    #popup-cancel-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.4);
-      z-index: 1600;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    #popup-cancel-box {
-      background: var(--color-light);
-      padding: 2rem 2.5rem;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      text-align: center;
-      width: 320px;
-      max-width: 90vw;
-      color: var(--color-text-dark);
-    }
+    /* Popup Cancelar Venta specific tweaks */
+    #popup-cancel-overlay { z-index: 1600; }
+    #popup-overlay { z-index: 1500; }
 
     #popup-cancel-box form {
       display: flex;
@@ -450,6 +448,14 @@
       margin-top: 0.25rem;
     }
 
+    /* Footer legal inside popup cancelar venta - match main footer */
+    .popup-legal {
+      margin-top: 1rem;
+      text-align: center;
+      color: #888;
+      font-size: 0.8rem;
+    }
+
   </style>
 </head>
 <body>
@@ -497,10 +503,10 @@
   </div>
 
   <!-- Popup Principal -->
-  <div id="popup-overlay" role="dialog" aria-modal="true" aria-labelledby="popup-message">
+  <div id="popup-overlay" class="popup-overlay" role="dialog" aria-modal="true" aria-labelledby="popup-message">
     <div id="popup-box">
-      <div id="popup-spinner">
-        <div></div>
+      <div id="popup-spinner" style="display:none; margin-bottom: 1rem;">
+        <div class="spinner"></div>
       </div>
       <p id="popup-message">Registrando venta, espera...</p>
       <button id="popup-close-btn" type="button">Cerrar</button>
@@ -508,7 +514,7 @@
   </div>
 
   <!-- Popup Cancelar Venta -->
-  <div id="popup-cancel-overlay" role="dialog" aria-modal="true" aria-labelledby="popup-cancel-message">
+  <div id="popup-cancel-overlay" class="popup-overlay" role="dialog" aria-modal="true" aria-labelledby="popup-cancel-message">
     <div id="popup-cancel-box">
       <h2 style="margin-bottom: 1rem; color: var(--color-accent); font-family: 'Poppins', sans-serif; font-weight: 700;">Cancelar Venta</h2>
       <form id="cancelVentaForm">
@@ -543,8 +549,13 @@
         <button type="button" id="confirmarCancelarVentaBtn">Cancelar Venta</button>
         <button type="button" id="popup-cancel-close-btn">Cerrar</button>
       </form>
-      <div id="popup-cancel-spinner" style="margin-top: 1rem;">
-        <div style="width:40px; height:40px; margin: 0 auto; border:4px solid var(--input-border); border-top:4px solid var(--color-accent); border-radius:50%; animation:spin 1s linear infinite;"></div>
+
+      <footer class="popup-legal">
+        <p>&copy; 2025. Irvin Prado. Ascende Superious - Busca Cosas Superiores.</p>
+      </footer>
+
+      <div id="popup-cancel-spinner" style="display:none; margin-top: 1rem;">
+        <div class="spinner"></div>
       </div>
       <p id="popup-cancel-message" style="margin-top: 1rem; font-weight: 600;"></p>
     </div>
@@ -556,8 +567,10 @@
     { codigo: 1, nombre: "Hamburguesa", precio: 50 },
     { codigo: 2, nombre: "Tacos", precio: 50 },
     { codigo: 3, nombre: "Enchilada", precio: 50 },
-    { codigo: 4, nombre: "Pupusas", precio: 50 },
-    { codigo: 5, nombre: "Pizza", precio: 50 }
+    { codigo: 4, nombre: "Repocheta", precio: 30 },
+    { codigo: 5, nombre: "Gaseosa", precio:  20},
+    { codigo: 6, nombre: "Hot-Dog", precio: 50 },
+    { codigo: 7, nombre: "Fresco", precio: 15 }
   ];
 
   let venta = [];
@@ -675,24 +688,33 @@
     }
   });
 
-  // Mostrar u ocultar popup principal
+  // Mostrar u ocultar popup principal (ahora con fade y control de spinner)
   const popupOverlay = document.getElementById("popup-overlay");
   const popupMessage = document.getElementById("popup-message");
   const popupCloseBtn = document.getElementById("popup-close-btn");
+  const popupSpinner = document.getElementById("popup-spinner");
+  const popupCancelOverlay = document.getElementById("popup-cancel-overlay");
 
   function mostrarPopup(mostrar, mensaje) {
     if (mostrar) {
       popupMessage.textContent = mensaje;
       popupCloseBtn.style.display = "none";
-      popupOverlay.style.display = "flex";
+      popupSpinner.style.display = "block";
+      // Ensure cancel popup is closed if open
+      popupCancelOverlay.classList.remove('show');
+      popupOverlay.classList.add('show');
     } else {
       popupMessage.textContent = mensaje;
       popupCloseBtn.style.display = "inline-block";
+      // hide spinner for confirmation
+      popupSpinner.style.display = "none";
+      popupOverlay.classList.add('show');
     }
   }
 
   popupCloseBtn.addEventListener("click", () => {
-    popupOverlay.style.display = "none";
+    popupOverlay.classList.remove('show');
+    popupSpinner.style.display = "none";
   });
 
   // --------------------
@@ -700,7 +722,6 @@
   // --------------------
 
   const abrirCancelPopupBtn = document.getElementById("abrirCancelPopupBtn");
-  const popupCancelOverlay = document.getElementById("popup-cancel-overlay");
   const popupCancelCloseBtn = document.getElementById("popup-cancel-close-btn");
   const cancelarProductoInput = document.getElementById("cancel-producto");
   const cancelarCantidadInput = document.getElementById("cancel-cantidad");
@@ -712,15 +733,10 @@
   const popupCancelSpinner = document.getElementById("popup-cancel-spinner");
   const popupCancelMessage = document.getElementById("popup-cancel-message");
 
-  // Abrir popup cancelar venta
+  // Abrir popup cancelar venta (ahora abre independientemente de la tabla principal)
   abrirCancelPopupBtn.addEventListener("click", () => {
-    if (venta.length === 0) {
-      alert("No hay productos para cancelar.");
-      return;
-    }
-
-    // Copiar la venta actual a ventaPopup para manejar cancelación
-    ventaPopup = venta.map(p => ({ ...p }));
+    // No arrastrar información del formulario principal
+    ventaPopup = []; // popup inicia vacía
     actualizarTablaCancelPopup();
     cancelarProductoInput.value = "";
     cancelarCantidadInput.value = "";
@@ -728,13 +744,18 @@
     popupCancelMessage.textContent = "";
     popupCancelSpinner.style.display = "none";
 
-    popupCancelOverlay.style.display = "flex";
+    // Close main popup if open
+    popupOverlay.classList.remove('show');
+    // Open cancel popup with fade
+    popupCancelOverlay.classList.add('show');
   });
 
   // Cerrar popup cancelar venta
   popupCancelCloseBtn.addEventListener("click", () => {
-    popupCancelOverlay.style.display = "none";
+    popupCancelOverlay.classList.remove('show');
     ventaPopup = [];
+    popupCancelMessage.textContent = "";
+    popupCancelSpinner.style.display = "none";
   });
 
   // Autocompletar popup cancelar venta
@@ -841,19 +862,21 @@
 
       const data = await response.json();
 
+      // Hide spinner and show confirmation message. Do not auto-close popup.
       popupCancelSpinner.style.display = "none";
       popupCancelMessage.textContent = "Venta cancelada con éxito.";
       confirmarCancelarVentaBtn.disabled = false;
 
+      // Mantener compatibilidad con comportamiento actual: limpiar ventas si así lo requería la app
       ventaPopup = [];
       venta = [];
       actualizarTabla();
       actualizarTablaCancelPopup();
 
-      setTimeout(() => {
-        popupCancelOverlay.style.display = "none";
-        popupCancelMessage.textContent = "";
-      }, 1800);
+      // Ensure main popup isn't visible/having spinner
+      popupOverlay.classList.remove('show');
+
+      // Important: do NOT auto-close the cancel popup. User must click 'Cerrar'.
 
     } catch (error) {
       popupCancelSpinner.style.display = "none";
