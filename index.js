@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middlewares
-app.use(cors());
+app.use(cors()); // Habilita CORS
 app.use(express.json());
 
 // Mostrar contenido del .env en consola (solo para pruebas)
@@ -48,7 +48,7 @@ app.post('/', async (req, res) => {
   try {
     if (accion === "registrar") {
       const filas = productos.map(item => ({
-        producto_id: item.id,
+        producto_id: item.producto_id,
         cantidad: item.cantidad,
         fecha,
         hora
@@ -61,6 +61,7 @@ app.post('/', async (req, res) => {
       if (error) throw error;
 
       res.status(200).json({ mensaje: 'Venta registrada correctamente', data });
+
     } else if (accion === "cancelar") {
       for (const item of productos) {
         let cantidadAEliminar = item.cantidad;
@@ -68,7 +69,7 @@ app.post('/', async (req, res) => {
         const { data: filasVentas, error: errSelect } = await supabase
           .from('ventas')
           .select('*')
-          .eq('producto_id', item.id)
+          .eq('producto_id', item.producto_id)
           .order('fecha', { ascending: true })
           .order('hora', { ascending: true });
 
