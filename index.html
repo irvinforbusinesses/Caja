@@ -197,9 +197,9 @@
         padding: 0;
       }
       footer {
-  font-size: 0.65rem;
-  padding: 0.5rem 1rem;
-  line-height: 1.2;
+        font-size: 0.65rem;
+        padding: 0.5rem 1rem;
+        line-height: 1.2;
       }
       
       .autocomplete-container {
@@ -250,18 +250,19 @@
       input {
         font-size: 16px;
       }
-    } /* Popup styles */
-  #popup-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 1500;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Poppins', sans-serif;
-}
+    }
 
+    /* Popup styles */
+    #popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1500;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+    }
 
     #popup-box {
       background: var(--color-light);
@@ -310,9 +311,143 @@
       background-color: var(--button-hover);
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    /* Popup Cancelar Venta styles */
+    #popup-cancel-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1600;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    #popup-cancel-box {
+      background: var(--color-light);
+      padding: 2rem 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      width: 320px;
+      max-width: 90vw;
+      color: var(--color-text-dark);
+    }
+
+    #popup-cancel-box form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    #popup-cancel-box .item-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    #popup-cancel-box .autocomplete-container {
+      position: relative;
+      flex: 1.8;
+    }
+
+    #popup-cancel-box input[type="text"],
+    #popup-cancel-box input[type="number"] {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--input-border);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    #popup-cancel-box input[type="text"]:focus,
+    #popup-cancel-box input[type="number"]:focus {
+      border-color: var(--input-focus-border);
+    }
+
+    #popup-cancel-box input[type="number"] {
+      max-width: 80px;
+      text-align: center;
+    }
+
+    #popup-cancel-box .autocomplete-list {
+      position: absolute;
+      top: 34px;
+      left: 0;
+      right: 0;
+      background: var(--color-light);
+      border: 1px solid var(--color-accent);
+      border-top: none;
+      max-height: 120px;
+      overflow-y: auto;
+      z-index: 9999;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 8px rgba(47,82,143,0.1);
+    }
+
+    #popup-cancel-box .autocomplete-item {
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    #popup-cancel-box .autocomplete-item:hover {
+      background: var(--color-accent);
+      color: var(--color-light);
+    }
+
+    #popup-cancel-box table {
+      width: 100%;
+      margin-top: 1rem;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    #popup-cancel-box th, #popup-cancel-box td {
+      border-bottom: 1px solid #ddd;
+      padding: 0.5rem;
+      text-align: left;
+    }
+
+    #popup-cancel-box .scrollable {
+      max-height: 180px;
+      overflow-y: auto;
+      margin-top: 1rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    #popup-cancel-box .total-container {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-accent);
+    }
+
+    #popup-cancel-box button {
+      margin-top: 0.75rem;
+      background-color: var(--color-accent);
+      color: var(--color-light);
+      font-weight: 700;
+      padding: 0.75rem 0;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    #popup-cancel-box button:hover {
+      background-color: var(--button-hover);
+    }
+
+    #popup-cancel-close-btn {
+      background-color: #777;
+      margin-top: 0.25rem;
     }
 
   </style>
@@ -351,6 +486,8 @@
         </div>
 
         <button type="submit">Registrar Venta</button>
+        <button type="button" id="abrirCancelPopupBtn" class="mini-button" style="width: auto; margin: 1rem auto 0 auto;">Cancelar Venta</button>
+
         <div id="msg"></div>
       </form>
     </div>
@@ -359,7 +496,7 @@
     </footer>
   </div>
 
-  <!-- Popup -->
+  <!-- Popup Principal -->
   <div id="popup-overlay" role="dialog" aria-modal="true" aria-labelledby="popup-message">
     <div id="popup-box">
       <div id="popup-spinner">
@@ -370,170 +507,361 @@
     </div>
   </div>
 
-  <script>
-    const productos = [
-      { codigo: 1, nombre: "Hamburguesa", precio: 50 },
-      { codigo: 2, nombre: "Tacos", precio: 50 },
-      { codigo: 3, nombre: "Enchilada", precio: 50 },
-      { codigo: 4, nombre: "Repocheta", precio: 50 },
-      { codigo: 5, nombre: "Gaseosa", precio: 25 },
-      { codigo: 6, nombre: "Hot-Dog", precio: 50 },
-      { codigo: 7, nombre: "Fresco", precio: 15 }
-    ];
+  <!-- Popup Cancelar Venta -->
+  <div id="popup-cancel-overlay" role="dialog" aria-modal="true" aria-labelledby="popup-cancel-message">
+    <div id="popup-cancel-box">
+      <h2 style="margin-bottom: 1rem; color: var(--color-accent); font-family: 'Poppins', sans-serif; font-weight: 700;">Cancelar Venta</h2>
+      <form id="cancelVentaForm">
+        <div class="item-row">
+          <div class="autocomplete-container">
+            <input type="text" id="cancel-producto" placeholder="Producto" autocomplete="off" />
+            <div class="autocomplete-list" id="cancel-list"></div>
+          </div>
+          <input type="number" id="cancel-cantidad" placeholder="Cant." min="1" />
+          <button type="button" class="mini-button" id="cancel-agregar-btn">Agregar</button>
+        </div>
 
-    const nombreACodigo = {};
-    const codigoAPrecio = {};
-    productos.forEach(p => {
-      nombreACodigo[p.nombre.toLowerCase()] = p.codigo;
-      codigoAPrecio[p.codigo] = p.precio;
+        <div class="scrollable">
+          <table id="tablaCancelVenta">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="total-container">
+          <div>Total:</div>
+          <div id="cancel-total">$0.00</div>
+        </div>
+
+        <button type="button" id="confirmarCancelarVentaBtn">Cancelar Venta</button>
+        <button type="button" id="popup-cancel-close-btn">Cerrar</button>
+      </form>
+      <div id="popup-cancel-spinner" style="margin-top: 1rem;">
+        <div style="width:40px; height:40px; margin: 0 auto; border:4px solid var(--input-border); border-top:4px solid var(--color-accent); border-radius:50%; animation:spin 1s linear infinite;"></div>
+      </div>
+      <p id="popup-cancel-message" style="margin-top: 1rem; font-weight: 600;"></p>
+    </div>
+  </div>
+
+  <script>
+  // Datos de productos (código y precio)
+  const productos = [
+    { codigo: 1, nombre: "Hamburguesa", precio: 50 },
+    { codigo: 2, nombre: "Tacos", precio: 50 },
+    { codigo: 3, nombre: "Enchilada", precio: 50 },
+    { codigo: 4, nombre: "Pupusas", precio: 50 },
+    { codigo: 5, nombre: "Pizza", precio: 50 }
+  ];
+
+  let venta = [];
+  let ventaPopup = [];
+
+  // Función para actualizar tabla y total en el formulario principal
+  function actualizarTabla() {
+    const tbody = document.querySelector("#tablaVenta tbody");
+    tbody.innerHTML = "";
+    let totalVenta = 0;
+
+    venta.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${item.nombre}</td>
+        <td>${item.cantidad}</td>
+        <td>$${item.precio.toFixed(2)}</td>
+        <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+      totalVenta += item.precio * item.cantidad;
     });
 
-    let venta = [];
+    document.getElementById("total").textContent = `$${totalVenta.toFixed(2)}`;
+  }
 
-    function setupAutocomplete() {
-      const input = document.getElementById("producto");
-      const list = document.getElementById("list");
+  // Autocompletar para formulario principal
+  const productoInput = document.getElementById("producto");
+  const list = document.getElementById("list");
 
-      input.addEventListener("input", () => {
-        const val = input.value.toLowerCase();
-        list.innerHTML = "";
-        if (!val) return;
+  productoInput.addEventListener("input", () => {
+    const val = productoInput.value.toLowerCase().trim();
+    list.innerHTML = "";
+    if (!val) return;
 
-        const filtered = productos.filter(p => p.nombre.toLowerCase().includes(val));
-        filtered.forEach(p => {
-          const div = document.createElement("div");
-          div.className = "autocomplete-item";
-          div.textContent = p.nombre;
-          div.onclick = () => {
-            input.value = p.nombre;
-            list.innerHTML = "";
-          };
-          list.appendChild(div);
+    productos.forEach(p => {
+      if (p.nombre.toLowerCase().startsWith(val)) {
+        const div = document.createElement("div");
+        div.classList.add("autocomplete-item");
+        div.textContent = p.nombre;
+        div.addEventListener("click", () => {
+          productoInput.value = p.nombre;
+          list.innerHTML = "";
         });
-      });
-
-      document.addEventListener("click", e => {
-        if (e.target !== input) list.innerHTML = "";
-      });
-    }
-
-    function agregarProducto() {
-      const nombre = document.getElementById("producto").value.trim();
-      const cantidad = parseInt(document.getElementById("cantidad").value);
-
-      if (!nombre || isNaN(cantidad) || cantidad < 1) return;
-
-      const nombreLower = nombre.toLowerCase();
-      const codigo = nombreACodigo[nombreLower];
-      const precio = codigoAPrecio[codigo];
-
-      if (!codigo) return;
-
-      const existente = venta.find(p => p.codigo === codigo);
-      if (existente) {
-        existente.cantidad += cantidad;
-      } else {
-        venta.push({ codigo, nombre, cantidad, precio });
+        list.appendChild(div);
       }
+    });
+  });
 
-      document.getElementById("producto").value = "";
-      document.getElementById("cantidad").value = "";
-      renderTabla();
+  document.addEventListener("click", e => {
+    if (!productoInput.contains(e.target)) {
+      list.innerHTML = "";
+    }
+  });
+
+  // Agregar producto al carrito principal
+  function agregarProducto() {
+    const nombre = productoInput.value.trim();
+    const cantidad = Number(document.getElementById("cantidad").value);
+
+    if (!nombre || cantidad < 1) {
+      alert("Por favor, ingresa un producto válido y cantidad mayor a 0.");
+      return;
     }
 
-    function renderTabla() {
-      const tbody = document.querySelector("#tablaVenta tbody");
-      tbody.innerHTML = "";
-      let total = 0;
-
-      venta.forEach(p => {
-        const row = document.createElement("tr");
-        const subtotal = p.precio * p.cantidad;
-        total += subtotal;
-
-        row.innerHTML = `
-          <td>${p.nombre}</td>
-          <td>${p.cantidad}</td>
-          <td>$${p.precio}</td>
-          <td>$${subtotal.toFixed(2)}</td>
-        `;
-        tbody.appendChild(row);
-      });
-
-      document.getElementById("total").textContent = "$" + total.toFixed(2);
+    const producto = productos.find(p => p.nombre.toLowerCase() === nombre.toLowerCase());
+    if (!producto) {
+      alert("Producto no encontrado.");
+      return;
     }
 
-    // Funciones para el popup
-    function mostrarPopup(mensaje, mostrarBotonCerrar = false) {
-      const overlay = document.getElementById('popup-overlay');
-      const messageEl = document.getElementById('popup-message');
-      const spinner = document.getElementById('popup-spinner');
-      const btnCerrar = document.getElementById('popup-close-btn');
-
-      messageEl.textContent = mensaje;
-      overlay.style.display = 'flex';
-      spinner.style.display = mostrarBotonCerrar ? 'none' : 'block';
-      btnCerrar.style.display = mostrarBotonCerrar ? 'inline-block' : 'none';
+    const existente = venta.find(p => p.codigo === producto.codigo);
+    if (existente) {
+      existente.cantidad += cantidad;
+    } else {
+      venta.push({ codigo: producto.codigo, nombre: producto.nombre, precio: producto.precio, cantidad });
     }
 
-    function cerrarPopup() {
-      document.getElementById('popup-overlay').style.display = 'none';
+    productoInput.value = "";
+    document.getElementById("cantidad").value = "";
+
+    actualizarTabla();
+  }
+
+  // Registrar venta (fetch)
+  document.getElementById("ventaForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (venta.length === 0) {
+      alert("No hay productos para registrar.");
+      return;
     }
 
-    document.getElementById('popup-close-btn').addEventListener('click', cerrarPopup);
+    const ventaEnviar = venta.map(p => ({
+      producto_id: p.codigo,  // <--- Cambiado a producto_id
+      cantidad: p.cantidad
+    }));
 
-    document.getElementById("ventaForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const msgEl = document.getElementById("msg");
-      msgEl.textContent = "";
-      msgEl.className = "";
+    mostrarPopup(true, "Registrando venta, espera...");
 
-      if (venta.length === 0) {
-        msgEl.textContent = "Agrega al menos un producto.";
-        msgEl.className = "error";
-        return;
-      }
-
-      const vendidos = venta.map(p => ({
-        codigo: p.codigo,
-        cantidad: p.cantidad
-      }));
-
-      const total = venta.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
-
-      mostrarPopup("Registrando venta, espera...", false);
-
-      fetch("https://caja-k0wo.onrender.com/", {
+    try {
+      const response = await fetch("https://caja-k0wo.onrender.com/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vendidos, total })
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("Error al registrar venta.");
-        return res.json();
-      })
-      .then(() => {
-        mostrarPopup("Venta registrada correctamente.", true);
-        msgEl.textContent = "Venta registrada correctamente.";
-        msgEl.className = "success";
-        venta = [];
-        renderTabla();
-      })
-      .catch(err => {
-        mostrarPopup("Error: " + err.message, true);
-        msgEl.textContent = err.message;
-        msgEl.className = "error";
+        body: JSON.stringify({ accion: "registrar", productos: ventaEnviar }) // productos, no vendidos
       });
+
+      if (!response.ok) throw new Error(`Error ${response.status}`);
+
+      const data = await response.json();
+      mostrarPopup(false, "Venta registrada con éxito.");
+      venta = [];
+      actualizarTabla();
+    } catch (error) {
+      mostrarPopup(false, `Error al registrar venta: ${error.message}`);
+    }
+  });
+
+  // Mostrar u ocultar popup principal
+  const popupOverlay = document.getElementById("popup-overlay");
+  const popupMessage = document.getElementById("popup-message");
+  const popupCloseBtn = document.getElementById("popup-close-btn");
+
+  function mostrarPopup(mostrar, mensaje) {
+    if (mostrar) {
+      popupMessage.textContent = mensaje;
+      popupCloseBtn.style.display = "none";
+      popupOverlay.style.display = "flex";
+    } else {
+      popupMessage.textContent = mensaje;
+      popupCloseBtn.style.display = "inline-block";
+    }
+  }
+
+  popupCloseBtn.addEventListener("click", () => {
+    popupOverlay.style.display = "none";
+  });
+
+  // --------------------
+  // Popup Cancelar Venta
+  // --------------------
+
+  const abrirCancelPopupBtn = document.getElementById("abrirCancelPopupBtn");
+  const popupCancelOverlay = document.getElementById("popup-cancel-overlay");
+  const popupCancelCloseBtn = document.getElementById("popup-cancel-close-btn");
+  const cancelarProductoInput = document.getElementById("cancel-producto");
+  const cancelarCantidadInput = document.getElementById("cancel-cantidad");
+  const cancelList = document.getElementById("cancel-list");
+  const tablaCancelVentaBody = document.querySelector("#tablaCancelVenta tbody");
+  const cancelTotalEl = document.getElementById("cancel-total");
+  const cancelAgregarBtn = document.getElementById("cancel-agregar-btn");
+  const confirmarCancelarVentaBtn = document.getElementById("confirmarCancelarVentaBtn");
+  const popupCancelSpinner = document.getElementById("popup-cancel-spinner");
+  const popupCancelMessage = document.getElementById("popup-cancel-message");
+
+  // Abrir popup cancelar venta
+  abrirCancelPopupBtn.addEventListener("click", () => {
+    if (venta.length === 0) {
+      alert("No hay productos para cancelar.");
+      return;
+    }
+
+    // Copiar la venta actual a ventaPopup para manejar cancelación
+    ventaPopup = venta.map(p => ({ ...p }));
+    actualizarTablaCancelPopup();
+    cancelarProductoInput.value = "";
+    cancelarCantidadInput.value = "";
+    cancelList.innerHTML = "";
+    popupCancelMessage.textContent = "";
+    popupCancelSpinner.style.display = "none";
+
+    popupCancelOverlay.style.display = "flex";
+  });
+
+  // Cerrar popup cancelar venta
+  popupCancelCloseBtn.addEventListener("click", () => {
+    popupCancelOverlay.style.display = "none";
+    ventaPopup = [];
+  });
+
+  // Autocompletar popup cancelar venta
+  cancelarProductoInput.addEventListener("input", () => {
+    const val = cancelarProductoInput.value.toLowerCase().trim();
+    cancelList.innerHTML = "";
+    if (!val) return;
+
+    productos.forEach(p => {
+      if (p.nombre.toLowerCase().startsWith(val)) {
+        const div = document.createElement("div");
+        div.classList.add("autocomplete-item");
+        div.textContent = p.nombre;
+        div.addEventListener("click", () => {
+          cancelarProductoInput.value = p.nombre;
+          cancelList.innerHTML = "";
+        });
+        cancelList.appendChild(div);
+      }
+    });
+  });
+
+  document.addEventListener("click", e => {
+    if (!cancelarProductoInput.contains(e.target)) {
+      cancelList.innerHTML = "";
+    }
+  });
+
+  // Actualizar tabla y total en popup cancelar venta
+  function actualizarTablaCancelPopup() {
+    tablaCancelVentaBody.innerHTML = "";
+    let totalPopup = 0;
+
+    ventaPopup.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${item.nombre}</td>
+        <td>${item.cantidad}</td>
+        <td>$${item.precio.toFixed(2)}</td>
+        <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+      `;
+      tablaCancelVentaBody.appendChild(tr);
+      totalPopup += item.precio * item.cantidad;
     });
 
-    setupAutocomplete();
+    cancelTotalEl.textContent = `$${totalPopup.toFixed(2)}`;
+  }
 
-    const cantidadInput = document.getElementById("cantidad");
-    if (window.innerWidth <= 600) {
-      cantidadInput.placeholder = "Cant.";
-    } else {
-      cantidadInput.placeholder = "Cantidad";
+  // Agregar producto al popup cancelar venta
+  cancelAgregarBtn.addEventListener("click", () => {
+    const nombre = cancelarProductoInput.value.trim();
+    const cantidad = Number(cancelarCantidadInput.value);
+
+    if (!nombre || cantidad < 1) {
+      alert("Por favor, ingresa un producto válido y cantidad mayor a 0.");
+      return;
     }
-  </script>
+
+    const producto = productos.find(p => p.nombre.toLowerCase() === nombre.toLowerCase());
+    if (!producto) {
+      alert("Producto no encontrado.");
+      return;
+    }
+
+    const existente = ventaPopup.find(p => p.codigo === producto.codigo);
+    if (existente) {
+      existente.cantidad += cantidad;
+    } else {
+      ventaPopup.push({ codigo: producto.codigo, nombre: producto.nombre, precio: producto.precio, cantidad });
+    }
+
+    cancelarProductoInput.value = "";
+    cancelarCantidadInput.value = "";
+    actualizarTablaCancelPopup();
+  });
+
+  // Confirmar cancelación de venta (fetch)
+  confirmarCancelarVentaBtn.addEventListener("click", async () => {
+    if (ventaPopup.length === 0) {
+      alert("No hay productos para cancelar.");
+      return;
+    }
+
+    const cancelados = ventaPopup.map(p => ({
+      producto_id: p.codigo,  // <--- Cambiado a producto_id
+      cantidad: p.cantidad
+    }));
+
+    popupCancelSpinner.style.display = "block";
+    popupCancelMessage.textContent = "";
+    confirmarCancelarVentaBtn.disabled = true;
+
+    try {
+      const response = await fetch("https://caja-k0wo.onrender.com/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accion: "cancelar", productos: cancelados }) // productos, no cancelados
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Error ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      popupCancelSpinner.style.display = "none";
+      popupCancelMessage.textContent = "Venta cancelada con éxito.";
+      confirmarCancelarVentaBtn.disabled = false;
+
+      ventaPopup = [];
+      venta = [];
+      actualizarTabla();
+      actualizarTablaCancelPopup();
+
+      setTimeout(() => {
+        popupCancelOverlay.style.display = "none";
+        popupCancelMessage.textContent = "";
+      }, 1800);
+
+    } catch (error) {
+      popupCancelSpinner.style.display = "none";
+      popupCancelMessage.textContent = `Error al cancelar venta: ${error.message}`;
+      confirmarCancelarVentaBtn.disabled = false;
+    }
+  });
+</script>
+
 </body>
 </html>
