@@ -1,3 +1,4 @@
+const express = require('express');  // <-- IMPORTANTE: faltaba esta línea
 const cors = require('cors');
 const fs = require('fs');
 require('dotenv').config();
@@ -11,7 +12,11 @@ app.use(cors()); // Habilita CORS
 app.use(express.json());
 
 // Mostrar contenido del .env en consola (solo para pruebas)
-console.log('Contenido del .env:', fs.readFileSync('.env', 'utf8'));
+try {
+  console.log('Contenido del .env:', fs.readFileSync('.env', 'utf8'));
+} catch (e) {
+  console.warn('No se pudo leer el archivo .env:', e.message);
+}
 console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
 console.log('SUPABASE_KEY:', process.env.SUPABASE_KEY);
 
@@ -32,7 +37,7 @@ app.get('/', (req, res) => {
   res.send('Servidor corriendo y conectado a Supabase!');
 });
 
-// Ruta para registrar ventas
+// Ruta para registrar y cancelar ventas
 app.post('/', async (req, res) => {
   const { accion = "registrar", vendidos } = req.body;
 
@@ -111,11 +116,7 @@ app.post('/', async (req, res) => {
   }
 });
 
-
 // Iniciar el servidor
 app.listen(port, () => {
-console.log(`Servidor escuchando en http://localhost:${port}`);
+  console.log(`Servidor escuchando en http://localhost:${port}`);
 });
-
-
-
