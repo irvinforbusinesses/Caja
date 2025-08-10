@@ -1,4 +1,3 @@
-const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 require('dotenv').config();
@@ -35,41 +34,87 @@ app.get('/', (req, res) => {
 
 // Ruta para registrar ventas
 app.post('/', async (req, res) => {
-  const { vendidos } = req.body;
+  const { accion = "registrar", vendidos } = req.body;
 
   if (!vendidos || !Array.isArray(vendidos) || vendidos.length === 0) {
     return res.status(400).json({ error: 'La lista de productos vendidos es obligatoria' });
   }
 
-  // Fecha y hora actuales en formato adecuado
   const now = new Date();
-  const fecha = now.toISOString().slice(0, 10); // YYYY-MM-DD
-  const hora = now.toTimeString().slice(0, 8);  // HH:MM:SS
+  const fecha = now.toISOString().slice(0, 10);
+  const hora = now.toTimeString().slice(0, 8);
 
   try {
-    // Preparar filas para insertar, con los campos correctos según tu tabla
-    const filas = vendidos.map(item => ({
-      producto_id: item.codigo,
-      cantidad: item.cantidad,
-      fecha,
-      hora
-    }));
+    if (accion === "registrar") {
+      const filas = vendidos.map(item => ({
+        producto_id: item.codigo,
+        cantidad: item.cantidad,
+        fecha,
+        hora
+      }));
 
-    // Insertar múltiples filas
-    const { data, error } = await supabase
-      .from('ventas')
-      .insert(filas);
+      const { data, error } = await supabase
+        .from('ventas')
+        .insert(filas);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    res.status(200).json({ mensaje: 'Venta registrada correctamente', data });
+      res.status(200).json({ mensaje: 'Venta registrada correctamente', data });
+    } else if (accion === "cancelar") {
+      for (const item of vendidos) {
+        let cantidadAEliminar = item.cantidad;
+
+        const { data: filasVentas, error: errSelect } = await supabase
+          .from('ventas')
+          .select('*')
+          .eq('producto_id', item.codigo)
+          .order('fecha', { ascending: true })
+          .order('hora', { ascending: true });
+
+        if (errSelect) throw errSelect;
+
+        for (const fila of filasVentas) {
+          if (cantidadAEliminar <= 0) break;
+
+          if (fila.cantidad > cantidadAEliminar) {
+            const nuevaCantidad = fila.cantidad - cantidadAEliminar;
+
+            const { error: errUpdate } = await supabase
+              .from('ventas')
+              .update({ cantidad: nuevaCantidad })
+              .eq('id', fila.id);
+
+            if (errUpdate) throw errUpdate;
+
+            cantidadAEliminar = 0;
+            break;
+          } else {
+            const { error: errDelete } = await supabase
+              .from('ventas')
+              .delete()
+              .eq('id', fila.id);
+
+            if (errDelete) throw errDelete;
+
+            cantidadAEliminar -= fila.cantidad;
+          }
+        }
+      }
+
+      res.status(200).json({ mensaje: 'Venta cancelada correctamente' });
+    } else {
+      res.status(400).json({ error: "Acción no reconocida" });
+    }
   } catch (err) {
-    console.error('Error al registrar la venta:', err.message);
-    res.status(500).json({ error: 'Error al registrar la venta' });
+    console.error('Error en la operación:', err.message);
+    res.status(500).json({ error: 'Error al procesar la operación' });
   }
 });
 
+
 // Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
+  console.log(Servidor escuchando en http://localhost:${port});
 });
+
+
