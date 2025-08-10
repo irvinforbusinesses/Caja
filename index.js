@@ -1,4 +1,4 @@
-const express = require('express');  // <-- IMPORTANTE: faltaba esta línea
+const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 require('dotenv').config();
@@ -8,15 +8,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middlewares
-app.use(cors()); // Habilita CORS
+app.use(cors());
 app.use(express.json());
 
 // Mostrar contenido del .env en consola (solo para pruebas)
-try {
-  console.log('Contenido del .env:', fs.readFileSync('.env', 'utf8'));
-} catch (e) {
-  console.warn('No se pudo leer el archivo .env:', e.message);
-}
+console.log('Contenido del .env:', fs.readFileSync('.env', 'utf8'));
 console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
 console.log('SUPABASE_KEY:', process.env.SUPABASE_KEY);
 
@@ -37,11 +33,11 @@ app.get('/', (req, res) => {
   res.send('Servidor corriendo y conectado a Supabase!');
 });
 
-// Ruta para registrar y cancelar ventas
+// Ruta para registrar o cancelar ventas
 app.post('/', async (req, res) => {
-  const { accion = "registrar", vendidos } = req.body;
+  const { accion = "registrar", productos } = req.body;
 
-  if (!vendidos || !Array.isArray(vendidos) || vendidos.length === 0) {
+  if (!productos || !Array.isArray(productos) || productos.length === 0) {
     return res.status(400).json({ error: 'La lista de productos vendidos es obligatoria' });
   }
 
@@ -51,8 +47,8 @@ app.post('/', async (req, res) => {
 
   try {
     if (accion === "registrar") {
-      const filas = vendidos.map(item => ({
-        producto_id: item.codigo,
+      const filas = productos.map(item => ({
+        producto_id: item.id,
         cantidad: item.cantidad,
         fecha,
         hora
@@ -66,13 +62,13 @@ app.post('/', async (req, res) => {
 
       res.status(200).json({ mensaje: 'Venta registrada correctamente', data });
     } else if (accion === "cancelar") {
-      for (const item of vendidos) {
+      for (const item of productos) {
         let cantidadAEliminar = item.cantidad;
 
         const { data: filasVentas, error: errSelect } = await supabase
           .from('ventas')
           .select('*')
-          .eq('producto_id', item.codigo)
+          .eq('producto_id', item.id)
           .order('fecha', { ascending: true })
           .order('hora', { ascending: true });
 
