@@ -1,0 +1,9 @@
+[
+  { "codigo": 1, "nombre": "Hamburguesa", "precio": 50 },
+  { "codigo": 2, "nombre": "Tacos", "precio": 50 },
+  { "codigo": 3, "nombre": "Enchilada", "precio": 50 },
+  { "codigo": 4, "nombre": "Repocheta", "precio": 50 },
+  { "codigo": 5, "nombre": "Gaseosa", "precio": 25 },
+  { "codigo": 6, "nombre": "Hot-Dog", "precio": 50 },
+  { "codigo": 7, "nombre": "Fresco", "precio": 15 }
+]
