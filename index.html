@@ -450,10 +450,10 @@
 
     /* Footer legal inside popup cancelar venta - match main footer */
     .popup-legal {
-      margin-top: 1rem;
+      margin-top: 0.8rem;
       text-align: center;
       color: #888;
-      font-size: 0.8rem;
+      font-size: 0.5rem;
     }
 
   </style>
@@ -587,14 +587,14 @@
       tr.innerHTML = `
         <td>${item.nombre}</td>
         <td>${item.cantidad}</td>
-        <td>$${item.precio.toFixed(2)}</td>
-        <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+        <td>C$${item.precio.toFixed(2)}</td>
+        <td>C$${(item.precio * item.cantidad).toFixed(2)}</td>
       `;
       tbody.appendChild(tr);
       totalVenta += item.precio * item.cantidad;
     });
 
-    document.getElementById("total").textContent = `$${totalVenta.toFixed(2)}`;
+    document.getElementById("total").textContent = `C$${totalVenta.toFixed(2)}`;
   }
 
   // Autocompletar para formulario principal
@@ -794,14 +794,14 @@
       tr.innerHTML = `
         <td>${item.nombre}</td>
         <td>${item.cantidad}</td>
-        <td>$${item.precio.toFixed(2)}</td>
-        <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+        <td>C$${item.precio.toFixed(2)}</td>
+        <td>C$${(item.precio * item.cantidad).toFixed(2)}</td>
       `;
       tablaCancelVentaBody.appendChild(tr);
       totalPopup += item.precio * item.cantidad;
     });
 
-    cancelTotalEl.textContent = `$${totalPopup.toFixed(2)}`;
+    cancelTotalEl.textContent = `C$${totalPopup.toFixed(2)}`;
   }
 
   // Agregar producto al popup cancelar venta
