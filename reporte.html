@@ -3,203 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard de Ventas Avanzado</title>
+  <title>Dashboard de Ventas Avanzado — Actualizado</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/echarts"></script>
   <!-- Flatpickr para selector rango fechas -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 20px;
-      background: #f4f4f4;
-      color: #222;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 6px;
-      font-weight: 700;
-      color: #004080;
-    }
-    #subtitulo {
-      text-align: center;
-      margin-bottom: 30px;
-      font-weight: 500;
-      color: #0066cc;
-      font-size: 1.1rem;
-      user-select: none;
-      min-height: 1.5em;
-    }
-    #selector-fechas {
-      max-width: 400px;
-      margin: 0 auto 30px auto;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    #selector-fechas input {
-      padding: 8px 12px;
-      font-size: 1rem;
-      border: 1.8px solid #007bff;
-      border-radius: 6px;
-      width: 180px;
-      cursor: pointer;
-      user-select: none;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
-    }
-    #selector-fechas input:focus {
-      outline: none;
-      border-color: #0056b3;
-    }
-    #btn-limpiar-fechas {
-      background-color: #e0e0e0;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      padding: 8px 14px;
-      font-size: 0.95rem;
-      color: #555;
-      user-select: none;
-      transition: background-color 0.3s ease;
-      align-self: center;
-    }
-    #btn-limpiar-fechas:hover {
-      background-color: #c0c0c0;
-    }
-
-    .resumen {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .tarjeta {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      min-width: 180px;
-      max-width: 240px;
-      text-align: center;
-      user-select: none;
-      cursor: pointer;
-      transition: box-shadow 0.3s ease;
-      position: relative;
-    }
-    .tarjeta:hover {
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    }
-    .tarjeta.filtrado {
-      box-shadow: 0 0 0 3px #007bff;
-    }
-    .valor {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #0059b3;
-    }
-    .comparativo {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #888;
-    }
-    .comparativo.positivo {
-      color: #188038;
-    }
-    .comparativo.negativo {
-      color: #d93025;
-    }
-    footer {
-      font-size: 0.65rem;
-      padding: 0.5rem 1rem;
-      line-height: 1.2;
-      text-align: center;
-    }
-    .boton-mostrar {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .boton-mostrar button {
-      padding: 12px 30px;
-      font-size: 18px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.25s ease;
-      user-select: none;
-    }
-    .boton-mostrar button:hover {
-      background-color: #0056b3;
-    }
-    .graficos {
-      max-width: 960px;
-      margin: 0 auto 60px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 30px;
-    }
-    .grafico {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      height: 380px;
-      user-select: none;
-      cursor: pointer;
-      transition: box-shadow 0.3s ease;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-    .grafico.filtrado {
-      box-shadow: 0 0 0 3px #007bff;
-    }
-    .grafico .export-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #007bff;
-      border: none;
-      color: white;
-      padding: 5px 9px;
-      font-size: 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      user-select: none;
-      opacity: 0.8;
-      transition: opacity 0.3s ease;
-      z-index: 10;
-    }
-    .grafico .export-btn:hover {
-      opacity: 1;
-    }
-    /* Responsive mobile */
-    @media (max-width: 768px) {
-      .graficos {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-      }
-      .tarjeta {
-        max-width: 100%;
-        min-width: auto;
-      }
-      #selector-fechas {
-        max-width: 100%;
-        justify-content: center;
-      }
-      #selector-fechas input {
-        width: 45vw;
-        max-width: 200px;
-      }
-    }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f4; color: #222; }
+    h1 { text-align: center; margin-bottom: 6px; font-weight: 700; color: #004080; }
+    #subtitulo { text-align: center; margin-bottom: 18px; font-weight: 500; color: #0066cc; font-size: 1.05rem; user-select: none; min-height:1.5em }
+    #selector-fechas { max-width: 700px; margin: 0 auto 20px auto; display:flex; gap:10px; justify-content:center; flex-wrap:wrap }
+    #selector-fechas input { padding:8px 12px; font-size:1rem; border:1.8px solid #007bff; border-radius:6px; width:180px; cursor:pointer }
+    #btn-limpiar-fechas { background:#e0e0e0; border:none; border-radius:6px; cursor:pointer; padding:8px 14px }
+    .resumen { display:flex; flex-wrap:wrap; justify-content:center; gap:18px; margin-bottom: 18px }
+    .tarjeta { background:white; padding:16px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); min-width:180px; max-width:260px; text-align:center; cursor:pointer; position:relative }
+    .tarjeta.filtrado { box-shadow:0 0 0 3px #007bff }
+    .valor { font-size:2rem; font-weight:700; margin-bottom:6px; color:#0059b3 }
+    .comparativo { font-size:0.9rem; font-weight:600; color:#888 }
+    .comparativo.positivo { color:#188038 }
+    .comparativo.negativo { color:#d93025 }
+    .oculto { display:none !important }
+    .boton-mostrar { text-align:center; margin-bottom:18px }
+    .boton-mostrar button { padding:10px 20px; font-size:16px; border:none; background-color:#007bff; color:white; border-radius:6px; cursor:pointer }
+    .graficos { max-width:1100px; margin:0 auto 40px; display:grid; grid-template-columns: 1fr 1fr; grid-gap:20px }
+    .grafico { background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); height:380px; position:relative; display:flex; flex-direction:column }
+    .grafico.filtrado { box-shadow:0 0 0 3px #007bff }
+    .grafico .export-btn { position:absolute; top:10px; right:10px; background:#007bff; border:none; color:white; padding:6px 8px; border-radius:6px; cursor:pointer }
+    footer { font-size:0.7rem; text-align:center }
+    @media (max-width: 900px) { .graficos { grid-template-columns:1fr } .tarjeta { max-width:100% } }
   </style>
 </head>
 <body>
@@ -212,58 +44,57 @@
     <button id="btn-limpiar-fechas" aria-label="Limpiar filtro de fechas">Limpiar</button>
   </div>
 
-  <section aria-label="Indicadores clave de desempeño" class="resumen" id="resumen-tarjetas">
-    <div class="tarjeta" id="tarjeta-total-cantidad" title="Filtrar por último día (Total productos vendidos)" role="button" tabindex="0" aria-pressed="false">
+  <section class="resumen" id="resumen-tarjetas" aria-label="Indicadores clave de desempeño">
+    <div class="tarjeta" id="tarjeta-total-cantidad" role="button" tabindex="0" aria-pressed="false" title="Total productos vendidos / click para filtrar por fecha(s)">
       <h3>Total Productos Vendidos</h3>
       <div class="valor" id="total-cantidad">0</div>
-      <div class="comparativo" id="comp-cantidad"></div>
+      <div class="comparativo" id="comp-cantidad" title=""> </div>
     </div>
-    <div class="tarjeta" id="tarjeta-total-ingresos" title="Filtrar por último día (Total ingresos)" role="button" tabindex="0" aria-pressed="false">
+
+    <div class="tarjeta" id="tarjeta-total-ingresos" role="button" tabindex="0" aria-pressed="false" title="Total ingresos / click para filtrar por fecha(s)">
       <h3>Total Ingresos</h3>
       <div class="valor" id="total-dinero">C$0.00</div>
-      <div class="comparativo" id="comp-ingresos"></div>
+      <div class="comparativo" id="comp-ingresos" title=""> </div>
     </div>
-    <div class="tarjeta" id="tarjeta-tendencia-producto" title="Filtrar por producto en tendencia" role="button" tabindex="0" aria-pressed="false">
+
+    <div class="tarjeta" id="tarjeta-tendencia-producto" role="button" tabindex="0" aria-pressed="false" title="Producto en tendencia / click para filtrar por producto">
       <h3>Producto en Tendencia ↑</h3>
       <div class="valor" id="producto-tendencia">-</div>
-      <div class="comparativo" id="comp-producto-tendencia"></div>
+      <div class="comparativo" id="comp-producto-tendencia"> </div>
     </div>
   </section>
 
-  <div class="boton-mostrar">
-    <button id="btn-mostrar-todo">Mostrar todo</button>
-  </div>
+  <div class="boton-mostrar"><button id="btn-mostrar-todo">Mostrar todo</button></div>
 
-  <section aria-label="Panel de gráficos de ventas" class="graficos" id="panel-graficos">
-    <div id="chart-linea" class="grafico" title="Ingresos por Día" tabindex="0" aria-label="Gráfico línea de ingresos por día">
-      <button class="export-btn" aria-label="Exportar gráfico ingresos por día a PNG">📷</button>
+  <section class="graficos" id="panel-graficos" aria-label="Panel de gráficos">
+    <div id="chart-linea" class="grafico" title="Ingresos por Día">
+      <button class="export-btn" aria-label="Exportar">📷</button>
     </div>
-    <div id="chart-barras" class="grafico" title="Productos Más Vendidos" tabindex="0" aria-label="Gráfico barras productos más vendidos">
-      <button class="export-btn" aria-label="Exportar gráfico productos más vendidos a PNG">📷</button>
+    <div id="chart-barras" class="grafico" title="Productos Más Vendidos">
+      <button class="export-btn">📷</button>
     </div>
-    <div id="chart-tendencia" class="grafico" title="Tendencia Acumulada" tabindex="0" aria-label="Gráfico línea tendencia acumulada">
-      <button class="export-btn" aria-label="Exportar gráfico tendencia acumulada a PNG">📷</button>
+    <div id="chart-tendencia" class="grafico" title="Tendencia Acumulada">
+      <button class="export-btn">📷</button>
     </div>
-    <div id="chart-heatmap" class="grafico" title="Ventas por Día de la Semana" tabindex="0" aria-label="Gráfico barras ventas por día de la semana">
-      <button class="export-btn" aria-label="Exportar gráfico ventas por día de la semana a PNG">📷</button>
+    <div id="chart-heatmap" class="grafico" title="Ventas por Día de la Semana">
+      <button class="export-btn">📷</button>
     </div>
-    <div id="chart-donut" class="grafico" title="Distribución Ingresos por Producto" tabindex="0" aria-label="Gráfico donut distribución ingresos por producto">
-      <button class="export-btn" aria-label="Exportar gráfico donut a PNG">📷</button>
+    <div id="chart-donut" class="grafico" title="Distribución Ingresos por Producto">
+      <button class="export-btn">📷</button>
     </div>
-    <div id="chart-bullet" class="grafico" title="Bullet Chart Rendimiento Ingresos" tabindex="0" aria-label="Gráfico bullet chart rendimiento ingresos">
-      <button class="export-btn" aria-label="Exportar gráfico bullet chart a PNG">📷</button>
+    <div id="chart-bullet" class="grafico" title="Bullet Chart Rendimiento Ingresos">
+      <button class="export-btn">📷</button>
     </div>
-    <div id="chart-treemap" class="grafico" title="Treemap Ventas por Producto" tabindex="0" aria-label="Gráfico treemap ventas por producto">
-      <button class="export-btn" aria-label="Exportar gráfico treemap a PNG">📷</button>
+    <!-- Reemplazado treemap por chart-velas (candlestick) -->
+    <div id="chart-velas" class="grafico" title="Velas (Ingresos por Día)">
+      <button class="export-btn">📷</button>
     </div>
-    <div id="chart-slope" class="grafico" title="Slope Chart Crecimiento Productos" tabindex="0" aria-label="Gráfico slope chart crecimiento productos">
-      <button class="export-btn" aria-label="Exportar gráfico slope chart a PNG">📷</button>
+    <div id="chart-slope" class="grafico" title="Slope Chart Crecimiento Productos">
+      <button class="export-btn">📷</button>
     </div>
   </section>
 
-  <footer>
-    <p>&copy; 2025. Irvin Prado. Ascende Superious - Busca Cosas Superiores.</p>
-  </footer>
+  <footer><p>&copy; 2025. Irvin Prado. Ascende Superious</p></footer>
 
   <script>
     const { createClient } = supabase;
@@ -272,579 +103,378 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrcXR0eXFxZmtzcGZ2bmJmY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MDk1MDAsImV4cCI6MjA3MDA4NTUwMH0.9MLYC25EGp25YFkdwOqN-gdgu3k_JBCDW6y6qKtSy6k'
     );
 
+    // Estado global
     let datosOriginales = [];
-    let filtroActivo = null; // { tipo: 'fecha'|'producto'|'rangoFecha', valor: any }
     let charts = {};
     const diasSemanaNombres = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
 
-    // Formatear fecha a DD/MM/YYYY
-    function formatearFecha(dateObj) {
-      const d = dateObj.getDate().toString().padStart(2,'0');
-      const m = (dateObj.getMonth()+1).toString().padStart(2,'0');
-      const y = dateObj.getFullYear();
-      return `${d}/${m}/${y}`;
-    }
+    // Filtros activos: rangoFecha (inicio, fin), selectedProducts Set, selectedDates Set, selectedDays Set
+    const estadoFiltros = {
+      rangoFecha: null,
+      productos: new Set(),
+      fechas: new Set(),
+      diasSemana: new Set()
+    };
 
-    // Inicializar flatpickr para selector fechas
+    // Utils
+    function formatearFechaObj(d){ const dd = d.getDate().toString().padStart(2,'0'); const mm=(d.getMonth()+1).toString().padStart(2,'0'); const yy=d.getFullYear(); return `${dd}/${mm}/${yy}` }
+    function isoToDate(s){ return new Date(s+'T00:00:00') }
+
+    // Inicializar flatpickr
     let fechaInicioPicker, fechaFinPicker;
-    function inicializarSelectorFechas(fechaMinima, fechaMaxima) {
-      fechaInicioPicker = flatpickr("#fecha-inicio", {
-        dateFormat: "Y-m-d",
-        maxDate: fechaMaxima,
-        minDate: fechaMinima,
-        defaultDate: null,
-        onChange: onRangoFechasChange
-      });
-      fechaFinPicker = flatpickr("#fecha-fin", {
-        dateFormat: "Y-m-d",
-        maxDate: fechaMaxima,
-        minDate: fechaMinima,
-        defaultDate: null,
-        onChange: onRangoFechasChange
-      });
+    function inicializarSelectorFechas(fechaMinima, fechaMaxima){
+      fechaInicioPicker = flatpickr('#fecha-inicio',{dateFormat:'Y-m-d', minDate:fechaMinima, maxDate:fechaMaxima, onChange: onRangoFechasChange});
+      fechaFinPicker = flatpickr('#fecha-fin',{dateFormat:'Y-m-d', minDate:fechaMinima, maxDate:fechaMaxima, onChange: onRangoFechasChange});
     }
-
-    function onRangoFechasChange() {
+    function onRangoFechasChange(){
       const inicio = fechaInicioPicker.selectedDates[0];
       const fin = fechaFinPicker.selectedDates[0];
-      if (inicio && fin) {
-        if (fin < inicio) {
-          alert("La fecha fin no puede ser anterior a la fecha inicio.");
-          return;
-        }
-        filtroActivo = { tipo: 'rangoFecha', valor: { inicio, fin } };
-        const datosFiltrados = filtrarDatos(datosOriginales, filtroActivo);
-        if (datosFiltrados.length === 0) {
-          const fechasOrdenadas = [...new Set(datosOriginales.map(d => d.fechaKey))].sort();
-          const fechaMasAntigua = fechasOrdenadas[0].split('-').reverse().join('/');
-          alert(`No hay datos en ese rango. Fecha más antigua registrada: ${fechaMasAntigua}`);
-          return;
-        }
-        actualizarSubtitulo(inicio, fin);
-        actualizarTarjetas(datosFiltrados);
-        actualizarGraficos(datosFiltrados);
-        marcarGraficoFiltrado(null);
+      if(inicio && fin){ if(fin < inicio){ alert('La fecha fin no puede ser anterior a la fecha inicio.'); return }
+        estadoFiltros.rangoFecha = { inicio, fin };
+        // limpiar selecciones por fechas/dias/productos? No: conservar selección multi
+        aplicarFiltrosYActualizar();
       }
     }
 
-    document.getElementById('btn-limpiar-fechas').addEventListener('click', () => {
-      filtroActivo = null;
-      fechaInicioPicker.clear();
-      fechaFinPicker.clear();
-      actualizarSubtitulo();
-      actualizarTarjetas(datosOriginales);
-      actualizarGraficos(datosOriginales);
-      marcarGraficoFiltrado(null);
+    document.getElementById('btn-limpiar-fechas').addEventListener('click', ()=>{
+      estadoFiltros.rangoFecha = null; fechaInicioPicker.clear(); fechaFinPicker.clear(); aplicarFiltrosYActualizar();
     });
 
-    function actualizarSubtitulo(inicio=null, fin=null) {
-      const subtituloEl = document.getElementById('subtitulo');
-      if (inicio && fin) {
-        subtituloEl.textContent = `Ventas desde ${formatearFecha(inicio)} hasta ${formatearFecha(fin)}`;
+    // Cargar datos desde Supabase y normalizar
+    async function cargarDatos(){
+      try{
+        const { data: ventas, error: errorVentas } = await supabaseClient.from('ventas').select('producto_id, cantidad, fecha');
+        if(errorVentas) throw errorVentas;
+        const { data: productos, error: errorProductos } = await supabaseClient.from('Producto').select('id, Producto, Precio');
+        if(errorProductos) throw errorProductos;
+        const mapa = {};
+        productos.forEach(p => mapa[p.id] = { nombre: p.Producto, precio: p.Precio });
+        const enr = ventas.map(v => {
+          const prod = mapa[v.producto_id] || { nombre: 'Desconocido', precio: 0 };
+          return { ...v, nombre: prod.nombre, precio: Number(prod.precio)||0, fechaKey: v.fecha, diaSemana: new Date(v.fecha).getDay() };
+        });
+        return enr;
+      }catch(err){ console.error(err); alert('Error al cargar datos. Revisa consola.'); return [] }
+    }
+
+    // Aplicar filtros del estado
+    function aplicarFiltros() {
+      let salida = datosOriginales.slice();
+      // Rango de fecha
+      if(estadoFiltros.rangoFecha){ const { inicio, fin } = estadoFiltros.rangoFecha; salida = salida.filter(d => { const fd = isoToDate(d.fechaKey); return fd >= inicio && fd <= fin }); }
+      // Fechas específicas
+      if(estadoFiltros.fechas.size){ salida = salida.filter(d => estadoFiltros.fechas.has(d.fechaKey)); }
+      // Productos
+      if(estadoFiltros.productos.size){ salida = salida.filter(d => estadoFiltros.productos.has(d.nombre)); }
+      // Dias semana
+      if(estadoFiltros.diasSemana.size){ salida = salida.filter(d => estadoFiltros.diasSemana.has(d.diaSemana)); }
+      return salida;
+    }
+
+    // Actualizar subtitulo dinámico según filtros activos
+    function actualizarSubtitulo(){
+      const sub = document.getElementById('subtitulo');
+      const partes = [];
+      if(estadoFiltros.rangoFecha) partes.push(`desde ${formatearFechaObj(estadoFiltros.rangoFecha.inicio)} hasta ${formatearFechaObj(estadoFiltros.rangoFecha.fin)}`);
+      if(estadoFiltros.fechas.size) partes.push(`fechas: ${Array.from(estadoFiltros.fechas).join(', ')}`);
+      if(estadoFiltros.diasSemana.size) partes.push(`días: ${Array.from(estadoFiltros.diasSemana).map(d=>diasSemanaNombres[d]).join(', ')}`);
+      if(estadoFiltros.productos.size) partes.push(`productos: ${Array.from(estadoFiltros.productos).join(', ')}`);
+      if(partes.length===0) sub.textContent = 'Ventas generales'; else sub.textContent = 'Ventas ' + partes.join(' | ');
+    }
+
+    // Calcular KPIs con comparación a periodo anterior equivalente
+    function calcularKPIs(dataVisible){
+      // total cantidad e ingresos en periodo visible
+      const totalCantidad = dataVisible.reduce((a,b)=>a+b.cantidad,0);
+      const totalIngresos = dataVisible.reduce((a,b)=>a+b.cantidad*b.precio,0);
+
+      // determinar periodo actual (si rango definido, usarlo; si no, usar min-max en dataVisible)
+      let inicioAct, finAct;
+      if(estadoFiltros.rangoFecha){ inicioAct = estadoFiltros.rangoFecha.inicio; finAct = estadoFiltros.rangoFecha.fin; }
+      else {
+        const fechas = Array.from(new Set(dataVisible.map(d=>d.fechaKey))).sort();
+        if(fechas.length===0){ inicioAct = finAct = null } else { inicioAct = isoToDate(fechas[0]); finAct = isoToDate(fechas[fechas.length-1]); }
+      }
+
+      // función para obtener datos del periodo anterior equivalente
+      function obtenerPeriodoAnterior(inicio, fin){ if(!inicio || !fin) return []; const dias = Math.round((fin - inicio)/(24*3600*1000)) + 1; const finPrev = new Date(inicio); finPrev.setDate(finPrev.getDate() - 1); const inicioPrev = new Date(finPrev); inicioPrev.setDate(inicioPrev.getDate() - (dias-1)); // inclusive
+        return datosOriginales.filter(d => { const fd = isoToDate(d.fechaKey); return fd >= inicioPrev && fd <= finPrev }); }
+
+      const periodoAnterior = inicioAct && finAct ? obtenerPeriodoAnterior(inicioAct, finAct) : [];
+
+      // calcular comparativos: si periodoAnterior tiene menos de 1 dia (o 1 valor de fecha distinto) ocultar comparativo
+      const diasPrevUnicos = new Set(periodoAnterior.map(d=>d.fechaKey)).size;
+      const mostrarComparativo = diasPrevUnicos >= 1; // requisito: al menos 1 día
+
+      // totales previos
+      const totalCantidadPrev = periodoAnterior.reduce((a,b)=>a+b.cantidad,0);
+      const totalIngresosPrev = periodoAnterior.reduce((a,b)=>a+b.cantidad*b.precio,0);
+
+      // comparación porcentual
+      const compCantidad = (mostrarComparativo && totalCantidadPrev>0) ? ((totalCantidad - totalCantidadPrev)/totalCantidadPrev)*100 : null;
+      const compIngresos = (mostrarComparativo && totalIngresosPrev>0) ? ((totalIngresos - totalIngresosPrev)/totalIngresosPrev)*100 : null;
+
+      // producto en tendencia: el que más creció comparando totales por producto contra periodo previo equivalente (si no hay prev, calcular por último día vs penúltimo si existe)
+      const ventasActPorProducto = {};
+      const ventasPrevPorProducto = {};
+      dataVisible.forEach(d=> ventasActPorProducto[d.nombre] = (ventasActPorProducto[d.nombre]||0)+d.cantidad);
+      periodoAnterior.forEach(d=> ventasPrevPorProducto[d.nombre] = (ventasPrevPorProducto[d.nombre]||0)+d.cantidad);
+      // si no hay periodoAnterior suficiente, intentar usar últimos 2 días dentro de dataVisible
+      let productoTendencia = '-'; let mayorCrec = -Infinity;
+      if(Object.keys(ventasPrevPorProducto).length>0){
+        for(const p in ventasActPorProducto){ const diff = (ventasActPorProducto[p]||0) - (ventasPrevPorProducto[p]||0); if(diff>mayorCrec){ mayorCrec=diff; productoTendencia=p } }
       } else {
-        subtituloEl.textContent = "Ventas generales";
+        // fallback: últimos 2 días dentro dataVisible
+        const fechas = Array.from(new Set(dataVisible.map(d=>d.fechaKey))).sort();
+        if(fechas.length>=2){ const d1=fechas[fechas.length-2]; const d2=fechas[fechas.length-1]; const v1={}, v2={}; dataVisible.forEach(d=>{ if(d.fechaKey===d1) v1[d.nombre]=(v1[d.nombre]||0)+d.cantidad; if(d.fechaKey===d2) v2[d.nombre]=(v2[d.nombre]||0)+d.cantidad }); const productos = Array.from(new Set([...Object.keys(v1), ...Object.keys(v2)])); productos.forEach(p=>{ const diff=(v2[p]||0)-(v1[p]||0); if(diff>mayorCrec){ mayorCrec=diff; productoTendencia=p } }); }
       }
+
+      return { totalCantidad, totalIngresos, compCantidad, compIngresos, productoTendencia, mayorCrecimiento: mayorCrec, periodoAnteriorRange: (mostrarComparativo ? getPeriodoAnteriorRange(inicioAct, finAct) : null) };
+
+      function getPeriodoAnteriorRange(inicio, fin){ if(!inicio||!fin) return null; const dias = Math.round((fin - inicio)/(24*3600*1000)) + 1; const finPrev = new Date(inicio); finPrev.setDate(finPrev.getDate() - 1); const inicioPrev = new Date(finPrev); inicioPrev.setDate(inicioPrev.getDate() - (dias-1)); return { inicio: inicioPrev, fin: finPrev } }
     }
 
-    // Carga datos de Supabase y los normaliza
-    async function cargarDatos() {
-      try {
-        const { data: ventas, error: errorVentas } = await supabaseClient
-          .from('ventas')
-          .select('producto_id, cantidad, fecha');
-        if (errorVentas) throw errorVentas;
-
-        const { data: productos, error: errorProductos } = await supabaseClient
-          .from('Producto')
-          .select('id, Producto, Precio');
-        if (errorProductos) throw errorProductos;
-
-        const mapaProductos = {};
-        productos.forEach(p => {
-          mapaProductos[p.id] = { nombre: p.Producto, precio: p.Precio };
-        });
-
-        const ventasEnriquecidas = ventas.map(v => {
-          const prod = mapaProductos[v.producto_id];
-          const fechaKey = v.fecha; // YYYY-MM-DD
-          const diaSemana = new Date(fechaKey).getDay();
-
-          return {
-            ...v,
-            nombre: prod ? prod.nombre : 'Desconocido',
-            precio: prod ? prod.precio : 0,
-            fechaKey,
-            diaSemana
-          };
-        });
-        return ventasEnriquecidas;
-      } catch (err) {
-        console.error("Error al cargar datos:", err);
-        alert("Error al cargar datos, revisa consola.");
-        return [];
-      }
-    }
-
-    // Filtra según filtro activo
-    function filtrarDatos(data, filtro) {
-      if (!filtro) return data;
-      if (filtro.tipo === 'rangoFecha') {
-        const inicio = filtro.valor.inicio;
-        const fin = filtro.valor.fin;
-        return data.filter(d => {
-          const fechaD = new Date(d.fechaKey + 'T00:00:00');
-          return fechaD >= inicio && fechaD <= fin;
-        });
-      }
-      if (filtro.tipo === 'producto') {
-        return data.filter(d => d.nombre === filtro.valor);
-      }
-      if (filtro.tipo === 'diaSemana') {
-        return data.filter(d => d.diaSemana === filtro.valor);
-      }
-      return data;
-    }
-
-    // Actualiza las tarjetas resumen
-    function actualizarTarjetas(data) {
-      const totalCantidad = data.reduce((a,v) => a+v.cantidad, 0);
-      const totalIngresos = data.reduce((a,v) => a+v.cantidad*v.precio, 0);
-
-      // Comparativos últimos dos días
-      const porFecha = {};
-      data.forEach(d => {
-        if (!porFecha[d.fechaKey]) porFecha[d.fechaKey] = { cantidad:0, ingresos:0 };
-        porFecha[d.fechaKey].cantidad += d.cantidad;
-        porFecha[d.fechaKey].ingresos += d.cantidad*d.precio;
-      });
-      const fechasOrdenadas = Object.keys(porFecha).sort();
-      const ultimoDia = fechasOrdenadas[fechasOrdenadas.length -1];
-      const diaAnterior = fechasOrdenadas[fechasOrdenadas.length -2];
-
-      const ultCant = ultimoDia ? porFecha[ultimoDia].cantidad : 0;
-      const antCant = diaAnterior ? porFecha[diaAnterior].cantidad : 0;
-      const ultIng = ultimoDia ? porFecha[ultimoDia].ingresos : 0;
-      const antIng = diaAnterior ? porFecha[diaAnterior].ingresos : 0;
-
-      const compCantidad = antCant === 0 ? null : ((ultCant - antCant)/antCant)*100;
-      const compIngresos = antIng === 0 ? null : ((ultIng - antIng)/antIng)*100;
-
-      // Producto en tendencia: el que más creció últimos 2 días
-      const ventasPorProducto = {};
-      data.forEach(d => {
-        if (!ventasPorProducto[d.nombre]) ventasPorProducto[d.nombre] = {};
-        if (!ventasPorProducto[d.nombre][d.fechaKey]) ventasPorProducto[d.nombre][d.fechaKey] = 0;
-        ventasPorProducto[d.nombre][d.fechaKey] += d.cantidad;
-      });
-      let productoTendencia = "-";
-      let mayorCrecimiento = -Infinity;
-      for (const producto in ventasPorProducto) {
-        const fechasProd = Object.keys(ventasPorProducto[producto]).sort();
-        const ult = fechasProd[fechasProd.length -1];
-        const penult = fechasProd[fechasProd.length -2];
-        if (ult && penult) {
-          const dif = ventasPorProducto[producto][ult] - ventasPorProducto[producto][penult];
-          if (dif > mayorCrecimiento) {
-            mayorCrecimiento = dif;
-            productoTendencia = producto;
-          }
-        }
-      }
-
-      // Actualizar HTML
-      document.getElementById('total-cantidad').textContent = totalCantidad.toLocaleString();
+    // Actualizar tarjetas en DOM con tooltips que indiquen periodo de comparación
+    function actualizarTarjetasUI(kpis){
+      document.getElementById('total-cantidad').textContent = kpis.totalCantidad.toLocaleString();
       const compCantEl = document.getElementById('comp-cantidad');
-      if (compCantidad === null) compCantEl.textContent = "";
-      else {
-        compCantEl.textContent = `${compCantidad.toFixed(1)}% vs día anterior`;
-        compCantEl.className = 'comparativo ' + (compCantidad>=0 ? 'positivo':'negativo');
-      }
+      if(kpis.compCantidad === null) { compCantEl.textContent = ''; compCantEl.title = 'Comparativo no disponible (periodo anterior insuficiente)'; }
+      else { compCantEl.textContent = `${kpis.compCantidad.toFixed(1)}% vs periodo anterior`; const r = kpis.periodoAnteriorRange; compCantEl.title = `Periodo comparación: ${formatearFechaObj(r.inicio)} - ${formatearFechaObj(r.fin)}`; compCantEl.className = 'comparativo ' + (kpis.compCantidad>=0 ? 'positivo' : 'negativo'); }
 
-      document.getElementById('total-dinero').textContent = `C$${totalIngresos.toFixed(2)}`;
+      document.getElementById('total-dinero').textContent = `C$${kpis.totalIngresos.toFixed(2)}`;
       const compIngEl = document.getElementById('comp-ingresos');
-      if (compIngresos === null) compIngEl.textContent = "";
-      else {
-        compIngEl.textContent = `${compIngresos.toFixed(1)}% vs día anterior`;
-        compIngEl.className = 'comparativo ' + (compIngresos>=0 ? 'positivo':'negativo');
-      }
+      if(kpis.compIngresos === null){ compIngEl.textContent = ''; compIngEl.title = 'Comparativo no disponible (periodo anterior insuficiente)'; }
+      else { compIngEl.textContent = `${kpis.compIngresos.toFixed(1)}% vs periodo anterior`; const r=kpis.periodoAnteriorRange; compIngEl.title = `Periodo comparación: ${formatearFechaObj(r.inicio)} - ${formatearFechaObj(r.fin)}`; compIngEl.className = 'comparativo ' + (kpis.compIngresos>=0 ? 'positivo' : 'negativo'); }
 
-      document.getElementById('producto-tendencia').textContent = productoTendencia;
-      document.getElementById('comp-producto-tendencia').textContent = mayorCrecimiento > 0 ? `+${mayorCrecimiento.toLocaleString()} unidades` : "Sin crecimiento";
-      document.getElementById('comp-producto-tendencia').className = 'comparativo ' + (mayorCrecimiento>0 ? 'positivo' : 'negativo');
+      document.getElementById('producto-tendencia').textContent = kpis.productoTendencia || '-';
+      const compProd = document.getElementById('comp-producto-tendencia');
+      compProd.textContent = (kpis.mayorCrecimiento>0) ? `+${kpis.mayorCrecimiento.toLocaleString()} unidades` : (kpis.mayorCrecimiento===0 ? 'Sin cambio' : 'Sin datos');
+      compProd.className = 'comparativo ' + (kpis.mayorCrecimiento>0 ? 'positivo' : 'negativo');
+
+      // Ocultar comparativos si periodo anterior insuficiente
+      if(!kpis.periodoAnteriorRange){ compCantEl.classList.add('oculto'); compIngEl.classList.add('oculto'); }
+      else { compCantEl.classList.remove('oculto'); compIngEl.classList.remove('oculto'); }
     }
 
-    // Crear gráficos con ECharts y llenarlos según datos filtrados
-    function actualizarGraficos(data) {
-      // Datos auxiliares
-      const ingresosPorDia = {};
-      const cantidadPorProducto = {};
-      const ventasPorDiaSemana = [0,0,0,0,0,0,0];
-      const ingresosPorProducto = {};
-
-      data.forEach(d => {
-        ingresosPorDia[d.fechaKey] = (ingresosPorDia[d.fechaKey]||0) + d.cantidad*d.precio;
-        cantidadPorProducto[d.nombre] = (cantidadPorProducto[d.nombre]||0) + d.cantidad;
-        ventasPorDiaSemana[d.diaSemana] += d.cantidad;
-        ingresosPorProducto[d.nombre] = (ingresosPorProducto[d.nombre]||0) + d.cantidad*d.precio;
-      });
-
-      // Ordenar fechas
-      const fechasOrdenadas = Object.keys(ingresosPorDia).sort();
-
-      // Chart línea ingresos por día
-      const optionLinea = {
-        title: { text: 'Ingresos por Día', left: 'center' },
-        tooltip: { trigger: 'axis', formatter: params => `${params[0].axisValue}<br/>Ingresos: C$${params[0].data.toFixed(2)}` },
-        xAxis: { type: 'category', data: fechasOrdenadas, axisLabel: { rotate: 45 } },
-        yAxis: { type: 'value', axisLabel: { formatter: val => `C$${val}` } },
-        series: [{
-          data: fechasOrdenadas.map(f => ingresosPorDia[f]),
-          type: 'line',
-          smooth: true,
-          lineStyle: { color: '#007bff' },
-          areaStyle: { color: 'rgba(0,123,255,0.2)' }
-        }]
-      };
-      charts.linea.setOption(optionLinea);
-
-      // Chart barras productos más vendidos
-      const productosOrdenados = Object.keys(cantidadPorProducto).sort((a,b) => cantidadPorProducto[b]-cantidadPorProducto[a]).slice(0,10);
-      const optionBarras = {
-        title: { text: 'Productos Más Vendidos', left: 'center' },
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        xAxis: { type: 'category', data: productosOrdenados, axisLabel: { rotate: 30, interval:0 } },
-        yAxis: { type: 'value', name: 'Cantidad' },
-        series: [{
-          data: productosOrdenados.map(p => cantidadPorProducto[p]),
-          type: 'bar',
-          itemStyle: { color: '#28a745' }
-        }]
-      };
-      charts.barras.setOption(optionBarras);
-
-      // Chart tendencia acumulada ingresos (linea acumulativa)
-      let acumulado = 0;
-      const acumulados = fechasOrdenadas.map(f => acumulado += ingresosPorDia[f]);
-      const optionTendencia = {
-        title: { text: 'Tendencia Acumulada', left: 'center' },
-        tooltip: { trigger: 'axis', formatter: params => `${params[0].axisValue}<br/>Acumulado: C$${params[0].data.toFixed(2)}` },
-        xAxis: { type: 'category', data: fechasOrdenadas, axisLabel: { rotate: 45 } },
-        yAxis: { type: 'value', axisLabel: { formatter: val => `C$${val}` } },
-        series: [{
-          data: acumulados,
-          type: 'line',
-          smooth: true,
-          lineStyle: { color: '#fd7e14' },
-          areaStyle: { color: 'rgba(253,126,20,0.2)' }
-        }]
-      };
-      charts.tendencia.setOption(optionTendencia);
-
-      // Chart heatmap ventas por día semana (barras)
-      const optionHeatmap = {
-        title: { text: 'Ventas por Día de la Semana', left: 'center' },
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        xAxis: { type: 'category', data: diasSemanaNombres },
-        yAxis: { type: 'value', name: 'Cantidad' },
-        series: [{
-          data: ventasPorDiaSemana,
-          type: 'bar',
-          itemStyle: { color: '#6610f2' }
-        }]
-      };
-      charts.heatmap.setOption(optionHeatmap);
-
-      // Chart donut distribución ingresos por producto
-      const ingresosTotales = Object.values(ingresosPorProducto).reduce((a,b)=>a+b,0);
-      const datosDonut = Object.entries(ingresosPorProducto)
-        .sort((a,b)=>b[1]-a[1])
-        .slice(0,10)
-        .map(([nombre, ingreso]) => ({ value: ingreso, name: nombre }));
-      const optionDonut = {
-        title: { text: 'Distribución Ingresos por Producto', left: 'center' },
-        tooltip: { trigger: 'item', formatter: '{b}: C${c} ({d}%)' },
-        legend: { bottom: 10, type: 'scroll' },
-        series: [
-          {
-            name: 'Ingresos',
-            type: 'pie',
-            radius: ['40%', '70%'],
-            avoidLabelOverlap: false,
-            label: { show: false, position: 'center' },
-            emphasis: { label: { show: true, fontSize: '18', fontWeight: 'bold' } },
-            labelLine: { show: false },
-            data: datosDonut
-          }
-        ]
-      };
-      charts.donut.setOption(optionDonut);
-
-      // Chart bullet (rendimiento ingresos)
-      // Suposición simple: Target diario fijo C$5000, datos actuales promedio ingresos diarios
-      const ingresosPorDiaArr = Object.values(ingresosPorDia);
-      const avgIngresosDia = ingresosPorDiaArr.length ? ingresosPorDiaArr.reduce((a,b)=>a+b,0)/ingresosPorDiaArr.length : 0;
-      const targetDiario = 5000;
-      const optionBullet = {
-        title: { text: 'Bullet Chart Rendimiento Ingresos', left: 'center' },
-        tooltip: { formatter: params => `Ingresos: C$${params.value}` },
-        xAxis: { max: targetDiario * 2, splitLine: { show: false } },
-        yAxis: { type: 'category', data: ['Ingresos'], axisTick: { show: false }, axisLine: { show: false }, axisLabel: { show: false } },
-        series: [
-          {
-            type: 'bar',
-            data: [targetDiario],
-            itemStyle: { color: '#ddd' },
-            barWidth: 20,
-            barGap: '-100%',
-            label: { show: true, position: 'insideRight', formatter: `Target C$${targetDiario}` }
-          },
-          {
-            type: 'bar',
-            data: [avgIngresosDia],
-            itemStyle: { color: '#20c997' },
-            barWidth: 20,
-            label: { show: true, position: 'insideRight', formatter: `Actual C$${avgIngresosDia.toFixed(2)}` }
-          }
-        ]
-      };
-      charts.bullet.setOption(optionBullet);
-
-      // Chart treemap ventas por producto (cantidad)
-      const datosTreemap = Object.entries(cantidadPorProducto)
-        .sort((a,b)=>b[1]-a[1])
-        .slice(0,20)
-        .map(([nombre, cantidad]) => ({ name: nombre, value: cantidad }));
-      const optionTreemap = {
-        title: { text: 'Treemap Ventas por Producto', left: 'center' },
-        tooltip: { formatter: '{b}: {c} unidades' },
-        series: [{
-          type: 'treemap',
-          data: datosTreemap,
-          leafDepth: 1,
-          roam: false,
-          label: { show: true, formatter: '{b}' }
-        }]
-      };
-      charts.treemap.setOption(optionTreemap);
-
-      // Chart slope chart crecimiento productos (últimos dos días)
-      // Preparar datos para slope chart
-      const fechasDistintas = [...new Set(data.map(d => d.fechaKey))].sort();
-      if (fechasDistintas.length < 2) {
-        charts.slope.clear();
-      } else {
-        const dia1 = fechasDistintas[fechasDistintas.length - 2];
-        const dia2 = fechasDistintas[fechasDistintas.length - 1];
-        const ventasDia1 = {};
-        const ventasDia2 = {};
-        data.forEach(d => {
-          if (d.fechaKey === dia1) ventasDia1[d.nombre] = (ventasDia1[d.nombre]||0) + d.cantidad;
-          if (d.fechaKey === dia2) ventasDia2[d.nombre] = (ventasDia2[d.nombre]||0) + d.cantidad;
-        });
-        // Obtener todos productos
-        const productosSlope = Array.from(new Set([...Object.keys(ventasDia1), ...Object.keys(ventasDia2)]));
-        // Datos para slope chart
-        // Formato: [producto, valorDia1, valorDia2]
-        const datosSlope = productosSlope.map(p => [p, ventasDia1[p]||0, ventasDia2[p]||0]);
-        // Opciones slope chart
-        const optionSlope = {
-          title: { text: 'Slope Chart Crecimiento Productos', left: 'center' },
-          tooltip: {
-            trigger: 'item',
-            formatter: params => {
-              if (params.componentType === 'series') {
-                const idx = params.dataIndex;
-                const item = datosSlope[idx];
-                const dif = item[2] - item[1];
-                return `${item[0]}<br>${dia1}: ${item[1]} unidades<br>${dia2}: ${item[2]} unidades<br>Δ ${dif > 0 ? '+' : ''}${dif}`;
-              }
-              return '';
-            }
-          },
-          xAxis: {
-            type: 'category',
-            data: [dia1, dia2],
-            axisTick: { show: false },
-            axisLine: { onZero: false },
-            splitLine: { show: false }
-          },
-          yAxis: {
-            type: 'value',
-            splitLine: { show: false }
-          },
-          series: productosSlope.map((producto, i) => ({
-            type: 'line',
-            data: [datosSlope[i][1], datosSlope[i][2]],
-            name: producto,
-            smooth: true,
-            symbolSize: 8,
-            lineStyle: {
-              width: 2,
-              color: datosSlope[i][2] >= datosSlope[i][1] ? '#198754' : '#dc3545'
-            },
-            emphasis: { focus: 'series' }
-          })),
-          legend: { show: false }
-        };
-        charts.slope.setOption(optionSlope);
-      }
-    }
-
-    // Inicializa los gráficos y guarda instancia en charts{}
-    function inicializarGraficos() {
+    // Inicializar charts ECharts
+    function inicializarGraficos(){
       charts.linea = echarts.init(document.getElementById('chart-linea'));
       charts.barras = echarts.init(document.getElementById('chart-barras'));
       charts.tendencia = echarts.init(document.getElementById('chart-tendencia'));
       charts.heatmap = echarts.init(document.getElementById('chart-heatmap'));
       charts.donut = echarts.init(document.getElementById('chart-donut'));
       charts.bullet = echarts.init(document.getElementById('chart-bullet'));
-      charts.treemap = echarts.init(document.getElementById('chart-treemap'));
+      charts.velas = echarts.init(document.getElementById('chart-velas'));
       charts.slope = echarts.init(document.getElementById('chart-slope'));
+      // hacer resize on window
+      window.addEventListener('resize', ()=> Object.values(charts).forEach(c=>c.resize()));
     }
 
-    // Marcar gráfico filtrado (resalta)
-    function marcarGraficoFiltrado(idGrafico) {
-      Object.entries(charts).forEach(([key, chart]) => {
-        const el = chart.getDom().parentElement;
-        if (el) {
-          if (key === idGrafico) el.classList.add('filtrado');
-          else el.classList.remove('filtrado');
-        }
-      });
-      // También desmarcar tarjetas
-      ['tarjeta-total-cantidad', 'tarjeta-total-ingresos', 'tarjeta-tendencia-producto'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if ((id === 'tarjeta-total-cantidad' && idGrafico === null) ||
-            (id === 'tarjeta-total-ingresos' && idGrafico === null) ||
-            (id === 'tarjeta-tendencia-producto' && idGrafico === null)) {
-          el.classList.remove('filtrado');
-          el.setAttribute('aria-pressed', 'false');
-        }
-      });
-    }
+    // Construir y actualizar todas las visualizaciones basadas en data filtrada
+    function actualizarVisualizaciones(dataFiltrada){
+      // PREPARAR AGGREGACIONES
+      const ingresosPorDia = {};
+      const cantidadPorProducto = {};
+      const ingresosPorProducto = {};
+      const ventasPorDiaSemana = [0,0,0,0,0,0,0];
 
-    // Agregar eventos para tarjetas que filtran
-    function agregarEventosTarjetas() {
-      const tarjetaCantidad = document.getElementById('tarjeta-total-cantidad');
-      const tarjetaIngresos = document.getElementById('tarjeta-total-ingresos');
-      const tarjetaTendencia = document.getElementById('tarjeta-tendencia-producto');
+      dataFiltrada.forEach(d=>{
+        ingresosPorDia[d.fechaKey] = (ingresosPorDia[d.fechaKey]||0) + d.cantidad*d.precio;
+        cantidadPorProducto[d.nombre] = (cantidadPorProducto[d.nombre]||0) + d.cantidad;
+        ingresosPorProducto[d.nombre] = (ingresosPorProducto[d.nombre]||0) + d.cantidad*d.precio;
+        ventasPorDiaSemana[d.diaSemana] += d.cantidad;
+      });
 
-      tarjetaCantidad.addEventListener('click', () => {
-        filtroActivo = { tipo: 'fecha', valor: obtenerUltimaFecha(datosOriginales) };
-        aplicarFiltro();
-        marcarGraficoFiltrado(null);
-        marcarTarjeta(tarjetaCantidad);
+      // Fechas ordenadas
+      const fechasOrdenadas = Object.keys(ingresosPorDia).sort();
+
+      // promedio ingresos diario (dependiente de dataFiltrada)
+      const ingresosArr = Object.values(ingresosPorDia);
+      const avgIngresos = ingresosArr.length ? ingresosArr.reduce((a,b)=>a+b,0)/ingresosArr.length : 0;
+
+      // --- Chart linea (Ingresos por día) ---
+      const optLinea = {
+        title:{ text:'Ingresos por Día', left:'center' },
+        tooltip:{ trigger:'axis', formatter: params => { const d = params[0]; const promedio = `Promedio: C$${avgIngresos.toFixed(2)}`; return `${d.axisValue}<br/>Ingresos: C$${d.data.toFixed(2)}<br/>${promedio}` } },
+        xAxis:{ type:'category', data: fechasOrdenadas, axisLabel:{ rotate:45 } },
+        yAxis:{ type:'value', axisLabel:{ formatter: v => `C$${v}` } },
+        series:[{ data: fechasOrdenadas.map(f => ingresosPorDia[f]), type:'line', smooth:true, areaStyle:{}, lineStyle:{ color:'#007bff' } }]
+      };
+      charts.linea.setOption(optLinea);
+
+      // click: seleccionar fecha(s)
+      charts.linea.off('click'); charts.linea.on('click', e=>{
+        if(!e || !e.name) return;
+        toggleSelection('fechas', e.name);
       });
-      tarjetaIngresos.addEventListener('click', () => {
-        filtroActivo = { tipo: 'fecha', valor: obtenerUltimaFecha(datosOriginales) };
-        aplicarFiltro();
-        marcarGraficoFiltrado(null);
-        marcarTarjeta(tarjetaIngresos);
-      });
-      tarjetaTendencia.addEventListener('click', () => {
-        const producto = document.getElementById('producto-tendencia').textContent;
-        if (!producto || producto === '-') return alert('No hay producto en tendencia para filtrar.');
-        filtroActivo = { tipo: 'producto', valor: producto };
-        aplicarFiltro();
-        marcarGraficoFiltrado(null);
-        marcarTarjeta(tarjetaTendencia);
-      });
-    }
-    function marcarTarjeta(tarjeta) {
-      ['tarjeta-total-cantidad', 'tarjeta-total-ingresos', 'tarjeta-tendencia-producto'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (el === tarjeta) {
-          el.classList.add('filtrado');
-          el.setAttribute('aria-pressed', 'true');
-        } else {
-          el.classList.remove('filtrado');
-          el.setAttribute('aria-pressed', 'false');
-        }
-      });
-    }
-    // Obtener última fecha en datos
-    function obtenerUltimaFecha(data) {
-      const fechas = [...new Set(data.map(d => d.fechaKey))].sort();
-      return fechas[fechas.length - 1];
-    }
-    // Aplica filtro activo y actualiza todo
-    function aplicarFiltro() {
-      let datosFiltrados = datosOriginales;
-      if (!filtroActivo) datosFiltrados = datosOriginales;
-      else {
-        if (filtroActivo.tipo === 'fecha') {
-          datosFiltrados = datosOriginales.filter(d => d.fechaKey === filtroActivo.valor);
-          actualizarSubtitulo(new Date(filtroActivo.valor + 'T00:00:00'), new Date(filtroActivo.valor + 'T00:00:00'));
-        }
-        else if (filtroActivo.tipo === 'producto') {
-          datosFiltrados = datosOriginales.filter(d => d.nombre === filtroActivo.valor);
-          actualizarSubtitulo();
-        }
-        else if (filtroActivo.tipo === 'rangoFecha') {
-          const inicio = filtroActivo.valor.inicio;
-          const fin = filtroActivo.valor.fin;
-          datosFiltrados = datosOriginales.filter(d => {
-            const fechaD = new Date(d.fechaKey + 'T00:00:00');
-            return fechaD >= inicio && fechaD <= fin;
-          });
-          actualizarSubtitulo(inicio, fin);
-        }
-        else datosFiltrados = datosOriginales;
+
+      // --- Chart barras (productos más vendidos) ---
+      const productosOrdenados = Object.keys(cantidadPorProducto).sort((a,b)=>cantidadPorProducto[b]-cantidadPorProducto[a]).slice(0,15);
+      const optBarras = {
+        title:{ text:'Productos Más Vendidos', left:'center' },
+        tooltip:{ trigger:'axis', axisPointer:{ type:'shadow' }, formatter: params => { const d=params[0]; const promedioCant = (Object.values(cantidadPorProducto).reduce((a,b)=>a+b,0)/(Object.keys(cantidadPorProducto).length||1)).toFixed(2); return `${d.name}: ${d.data} unidades<br/>Promedio por producto: ${promedioCant}` } },
+        xAxis:{ type:'category', data: productosOrdenados, axisLabel:{ rotate:30, interval:0 } },
+        yAxis:{ type:'value', name:'Cantidad' },
+        series:[{ data: productosOrdenados.map(p=>cantidadPorProducto[p]), type:'bar', itemStyle:{ color: '#28a745' } }]
+      };
+      charts.barras.setOption(optBarras);
+      charts.barras.off('click'); charts.barras.on('click', e=>{ if(e && e.name) toggleSelection('productos', e.name); });
+
+      // --- Chart tendencia acumulada ---
+      let acumulado=0; const acumulados = fechasOrdenadas.map(f=> acumulado += ingresosPorDia[f]);
+      const optTend = {
+        title:{ text:'Tendencia Acumulada', left:'center' },
+        tooltip:{ trigger:'axis', formatter: params=> { const d=params[0]; return `${d.axisValue}<br/>Acumulado: C$${d.data.toFixed(2)}<br/>Promedio ingreso día: C$${avgIngresos.toFixed(2)}` } },
+        xAxis:{ type:'category', data:fechasOrdenadas, axisLabel:{ rotate:45 } }, yAxis:{ type:'value', axisLabel:{ formatter: v=>`C$${v}` } },
+        series:[{ data:acumulados, type:'line', smooth:true, areaStyle:{}, lineStyle:{ color:'#fd7e14' } }]
+      };
+      charts.tendencia.setOption(optTend);
+
+      // click en tendencia: actúa igual que linea (fechas)
+      charts.tendencia.off('click'); charts.tendencia.on('click', e=>{ if(e && e.name) toggleSelection('fechas', e.name); });
+
+      // --- Chart heatmap (ventas por día semana) ---
+      const optHeat = {
+        title:{ text:'Ventas por Día de la Semana', left:'center' },
+        tooltip:{ trigger:'axis', axisPointer:{ type:'shadow' }, formatter: params=> { const d=params[0]; const prom = (ventasPorDiaSemana.reduce((a,b)=>a+b,0)/7).toFixed(2); return `${d.name}: ${d.data} unidades<br/>Promedio semanal: ${prom}` } },
+        xAxis:{ type:'category', data: diasSemanaNombres }, yAxis:{ type:'value', name:'Cantidad' },
+        series:[{ data: ventasPorDiaSemana, type:'bar', itemStyle:{ color:'#6610f2' } }]
+      };
+      charts.heatmap.setOption(optHeat);
+      charts.heatmap.off('click'); charts.heatmap.on('click', e=>{ if(e && typeof e.dataIndex !== 'undefined') toggleSelection('diasSemana', e.dataIndex); });
+
+      // --- Chart donut (ingresos por producto) ---
+      const datosDonut = Object.entries(ingresosPorProducto).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([n,i])=>({value:i, name:n}));
+      const optDonut = { title:{ text:'Distribución Ingresos por Producto', left:'center' }, tooltip:{ trigger:'item', formatter: params=> { const promedioPorProd = (Object.values(ingresosPorProducto).reduce((a,b)=>a+b,0)/(Object.keys(ingresosPorProducto).length||1)).toFixed(2); return `${params.name}: C$${params.value.toFixed(2)}<br/>%: ${params.percent}%<br/>Promedio ingresos por producto: C$${promedioPorProd}` } }, legend:{ bottom:10, type:'scroll' }, series:[{ name:'Ingresos', type:'pie', radius:['40%','70%'], data:datosDonut }] };
+      charts.donut.setOption(optDonut);
+      charts.donut.off('click'); charts.donut.on('click', e=>{ if(e && e.name) toggleSelection('productos', e.name); });
+
+      // --- Chart bullet (rendimiento ingresos) ---
+      const avgDiario = avgIngresos; const targetDiario = 5000;
+      const optBullet = {
+        title:{ text:'Bullet Chart Rendimiento Ingresos', left:'center' },
+        tooltip:{ formatter: params => `Ingresos: C$${params.value}` },
+        xAxis:{ max: targetDiario*2, splitLine:{ show:false } }, yAxis:{ type:'category', data:['Ingresos'], axisTick:{ show:false }, axisLine:{ show:false }, axisLabel:{ show:false } },
+        series:[{ type:'bar', data:[targetDiario], itemStyle:{ color:'#ddd' }, barWidth:20, barGap:'-100%', label:{ show:true, position:'insideRight', formatter:`Target C$${targetDiario}` } }, { type:'bar', data:[avgDiario], itemStyle:{ color:'#20c997' }, barWidth:20, label:{ show:true, position:'insideRight', formatter:`Actual C$${avgDiario.toFixed(2)}` } }]
+      };
+      charts.bullet.setOption(optBullet);
+
+      // --- Chart velas (candlestick) reemplaza treemap ---
+      // Crear serie de velas donde open = prev day revenue, close = current day revenue, low=min, high=max
+      const velasData = [];
+      for(let i=0;i<fechasOrdenadas.length;i++){
+        const curr = ingresosPorDia[fechasOrdenadas[i]] || 0;
+        const prev = i>0 ? (ingresosPorDia[fechasOrdenadas[i-1]] || 0) : curr;
+        const open = prev; const close = curr; const low = Math.min(open, close); const high = Math.max(open, close);
+        velasData.push([open, close, low, high]);
       }
-      actualizarTarjetas(datosFiltrados);
-      actualizarGraficos(datosFiltrados);
-    }
+      const optVel = {
+        title:{ text:'Velas (Ingresos por Día)', left:'center' },
+        tooltip:{ trigger:'item', formatter: params => { const idx = params.dataIndex; const fecha = fechasOrdenadas[idx]; const val = ingresosPorDia[fecha]||0; return `${fecha}<br/>Ingresos: C$${val.toFixed(2)}<br/>Promedio periodo: C$${avgIngresos.toFixed(2)}` } },
+        xAxis:{ data:fechasOrdenadas, axisLabel:{ rotate:45 } }, yAxis:{ scale:true, axisLabel:{ formatter: v=>`C$${v}` } },
+        series:[{ type:'candlestick', data: velasData, itemStyle:{ color:'#007bff', color0:'#d93025', borderColor:'#007bff', borderColor0:'#d93025' }, markLine:{ silent:true, data:[{ yAxis: avgIngresos, name:'Promedio' }] } }]
+      };
+      charts.velas.setOption(optVel);
+      charts.velas.off('click'); charts.velas.on('click', e=>{ if(e && e.name) toggleSelection('fechas', e.name); });
 
-    // Exportar gráfico a PNG
-    function agregarExportadores() {
-      Object.entries(charts).forEach(([key, chart]) => {
+      // --- Chart slope (últimos dos días comparativa) ---
+      const fechasUnicas = fechasOrdenadas;
+      if(fechasUnicas.length<2){ charts.slope.clear(); }
+      else{
+        const dia1 = fechasUnicas[fechasUnicas.length-2]; const dia2 = fechasUnicas[fechasUnicas.length-1];
+        const v1={}, v2={}; dataFiltrada.forEach(d=>{ if(d.fechaKey===dia1) v1[d.nombre]=(v1[d.nombre]||0)+d.cantidad; if(d.fechaKey===dia2) v2[d.nombre]=(v2[d.nombre]||0)+d.cantidad });
+        const productosSlope = Array.from(new Set([...Object.keys(v1), ...Object.keys(v2)])).slice(0,40);
+        const datosSlope = productosSlope.map(p=>[p, v1[p]||0, v2[p]||0]);
+        const optionSlope = {
+          title:{ text:'Slope Chart Crecimiento Productos', left:'center' },
+          tooltip:{ trigger:'item', formatter: params => { const idx = params.dataIndex; const item = datosSlope[idx]; const dif = item[2]-item[1]; return `${item[0]}<br/>${dia1}: ${item[1]} unidades<br/>${dia2}: ${item[2]} unidades<br/>Δ ${dif>0?'+':''}${dif}` } },
+          xAxis:{ type:'category', data:[dia1,dia2], axisTick:{ show:false } }, yAxis:{ type:'value' },
+          series: productosSlope.map((p,i)=>({ type:'line', data:[datosSlope[i][1], datosSlope[i][2]], name:p, smooth:true, symbolSize:6, lineStyle:{ width:2, color: datosSlope[i][2]>=datosSlope[i][1] ? '#198754' : '#dc3545' }, emphasis:{ focus:'series' } })), legend:{ show:false }
+        };
+        charts.slope.setOption(optionSlope);
+        // click en slope: si se hace click en la leyenda/serie, obtenemos nombre a través de event.name
+        charts.slope.off('click'); charts.slope.on('click', e=>{ if(e && e.seriesName) toggleSelection('productos', e.seriesName); });
+      }
+
+      // Export buttons
+      Object.entries(charts).forEach(([k, chart])=>{
         const btn = chart.getDom().parentElement.querySelector('.export-btn');
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          const url = chart.getDataURL({ pixelRatio: 2, backgroundColor: '#fff' });
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `grafico_${key}.png`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        });
+        if(btn && !btn._attached){ btn._attached = true; btn.addEventListener('click', ev=>{ ev.stopPropagation(); const url = chart.getDataURL({ pixelRatio:2, backgroundColor:'#fff' }); const a=document.createElement('a'); a.href=url; a.download=`grafico_${k}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); }); }
       });
+
+      // Resaltar elementos que están seleccionados (aplicar clases visuales)
+      aplicarResaltadosVisuales();
     }
 
-    // Botón mostrar todo quita filtro y muestra todo
-    document.getElementById('btn-mostrar-todo').addEventListener('click', () => {
-      filtroActivo = null;
-      fechaInicioPicker.clear();
-      fechaFinPicker.clear();
+    // Toggle selection general para multi-selección
+    function toggleSelection(tipo, valor){
+      if(tipo==='productos'){
+        if(estadoFiltros.productos.has(valor)) estadoFiltros.productos.delete(valor); else estadoFiltros.productos.add(valor);
+      } else if(tipo==='fechas'){
+        if(estadoFiltros.fechas.has(valor)) estadoFiltros.fechas.delete(valor); else estadoFiltros.fechas.add(valor);
+      } else if(tipo==='diasSemana'){
+        if(estadoFiltros.diasSemana.has(valor)) estadoFiltros.diasSemana.delete(valor); else estadoFiltros.diasSemana.add(valor);
+      }
+      aplicarFiltrosYActualizar();
+    }
+
+    // Aplicar filtros y actualizar todo (KPIs, charts, subtitulo)
+    function aplicarFiltrosYActualizar(){
+      const dataFiltrada = aplicarFiltros();
+      // KPIs con comparativo periodo anterior equivalente (basado siempre en el dataFiltrada)
+      const kpis = calcularKPIs(dataFiltrada);
+      actualizarTarjetasUI(kpis);
+      actualizarVisualizaciones(dataFiltrada);
       actualizarSubtitulo();
-      actualizarTarjetas(datosOriginales);
-      actualizarGraficos(datosOriginales);
-      marcarGraficoFiltrado(null);
-      marcarTarjeta(null);
-    });
+    }
+
+    // Aplicar resaltados visuales (clases .filtrado en tarjetas y graficos)
+    function aplicarResaltadosVisuales(){
+      // Tarjetas: si hay filtros por fechas o productos, marcar tarjetas como filtradas
+      ['tarjeta-total-cantidad','tarjeta-total-ingresos','tarjeta-tendencia-producto'].forEach(id=>{ const el = document.getElementById(id); if(!el) return; if(estadoFiltros.productos.size||estadoFiltros.fechas.size||estadoFiltros.diasSemana.size||estadoFiltros.rangoFecha) el.classList.add('filtrado'); else el.classList.remove('filtrado'); });
+      // Graficos: si selección por producto y gráfico es el de barras o donut o slope, marcarlo
+      // Aquí solo se aplica clase visual al contenedor del gráfico si tiene alguna selección relevante
+      Object.entries(charts).forEach(([k,c])=>{ const el = c.getDom().parentElement; if(!el) return; el.classList.remove('filtrado'); if(k==='barras' && estadoFiltros.productos.size) el.classList.add('filtrado'); if(k==='donut' && estadoFiltros.productos.size) el.classList.add('filtrado'); if(k==='slope' && estadoFiltros.productos.size) el.classList.add('filtrado'); if((k==='linea' || k==='tendencia' || k==='velas') && (estadoFiltros.fechas.size||estadoFiltros.rangoFecha)) el.classList.add('filtrado'); if(k==='heatmap' && estadoFiltros.diasSemana.size) el.classList.add('filtrado'); });
+    }
+
+    // Evento mostrar todo
+    document.getElementById('btn-mostrar-todo').addEventListener('click', ()=>{ estadoFiltros.rangoFecha = null; estadoFiltros.productos.clear(); estadoFiltros.fechas.clear(); estadoFiltros.diasSemana.clear(); fechaInicioPicker.clear(); fechaFinPicker.clear(); aplicarFiltrosYActualizar(); });
+
+    // Clicks en tarjetas para acciones rápidas
+    function agregarEventosTarjetas(){
+      document.getElementById('tarjeta-total-cantidad').addEventListener('click', ()=>{
+        // filtrar por última fecha disponible en datosOriginales
+        const ultima = obtenerUltimaFecha(datosOriginales);
+        if(ultima){ toggleSelection('fechas', ultima); }
+      });
+      document.getElementById('tarjeta-total-ingresos').addEventListener('click', ()=>{ const ultima = obtenerUltimaFecha(datosOriginales); if(ultima) toggleSelection('fechas', ultima); });
+      document.getElementById('tarjeta-tendencia-producto').addEventListener('click', ()=>{ const prod = document.getElementById('producto-tendencia').textContent; if(prod && prod !== '-') toggleSelection('productos', prod); else alert('No hay producto en tendencia para filtrar.'); });
+    }
+
+    function obtenerUltimaFecha(data){ const f = Array.from(new Set(data.map(d=>d.fechaKey))).sort(); return f.length? f[f.length-1] : null }
 
     // Inicialización principal
-    async function inicializar() {
+    async function inicializar(){
       inicializarSelectorFechas('2022-01-01', new Date());
       inicializarGraficos();
       datosOriginales = await cargarDatos();
-      if (datosOriginales.length === 0) {
-        alert("No hay datos disponibles.");
-        return;
-      }
-      actualizarTarjetas(datosOriginales);
-      actualizarGraficos(datosOriginales);
+      if(datosOriginales.length===0){ alert('No hay datos disponibles.'); return }
+      // Inicializar estado y render
+      aplicarFiltrosYActualizar();
       agregarEventosTarjetas();
-      agregarExportadores();
+
+      // click outside para limpiar selecciones (click en body donde no sea grafico)
+      document.addEventListener('click', (e)=>{
+        // si se hace click en algun elemento con clase grafico o dentro de uno, no limpiar
+        const dentroGrafico = e.target.closest('.grafico');
+        if(!dentroGrafico && !e.target.closest('#selector-fechas') && !e.target.closest('.tarjeta') && !e.target.closest('.export-btn')){
+          // limpiar solo productos y fechas y dias, pero mantener rango si el usuario lo seleccionó explicitamente
+          estadoFiltros.productos.clear(); estadoFiltros.fechas.clear(); estadoFiltros.diasSemana.clear(); aplicarFiltrosYActualizar();
+        }
+      });
     }
 
     window.addEventListener('load', inicializar);
-    window.addEventListener('resize', () => {
-      Object.values(charts).forEach(c => c.resize());
-    });
   </script>
 </body>
 </html>
