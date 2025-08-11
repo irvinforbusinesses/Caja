@@ -220,7 +220,7 @@
     </div>
     <div class="tarjeta" id="tarjeta-total-ingresos" title="Filtrar por último día (Total ingresos)" role="button" tabindex="0" aria-pressed="false">
       <h3>Total Ingresos</h3>
-      <div class="valor" id="total-dinero">$0.00</div>
+      <div class="valor" id="total-dinero">C$0.00</div>
       <div class="comparativo" id="comp-ingresos"></div>
     </div>
     <div class="tarjeta" id="tarjeta-tendencia-producto" title="Filtrar por producto en tendencia" role="button" tabindex="0" aria-pressed="false">
@@ -460,7 +460,7 @@
         compCantEl.className = 'comparativo ' + (compCantidad>=0 ? 'positivo':'negativo');
       }
 
-      document.getElementById('total-dinero').textContent = `$${totalIngresos.toFixed(2)}`;
+      document.getElementById('total-dinero').textContent = `C$${totalIngresos.toFixed(2)}`;
       const compIngEl = document.getElementById('comp-ingresos');
       if (compIngresos === null) compIngEl.textContent = "";
       else {
@@ -494,9 +494,9 @@
       // Chart línea ingresos por día
       const optionLinea = {
         title: { text: 'Ingresos por Día', left: 'center' },
-        tooltip: { trigger: 'axis', formatter: params => `${params[0].axisValue}<br/>Ingresos: $${params[0].data.toFixed(2)}` },
+        tooltip: { trigger: 'axis', formatter: params => `${params[0].axisValue}<br/>Ingresos: C$${params[0].data.toFixed(2)}` },
         xAxis: { type: 'category', data: fechasOrdenadas, axisLabel: { rotate: 45 } },
-        yAxis: { type: 'value', axisLabel: { formatter: val => `$${val}` } },
+        yAxis: { type: 'value', axisLabel: { formatter: val => `C$${val}` } },
         series: [{
           data: fechasOrdenadas.map(f => ingresosPorDia[f]),
           type: 'line',
@@ -527,9 +527,9 @@
       const acumulados = fechasOrdenadas.map(f => acumulado += ingresosPorDia[f]);
       const optionTendencia = {
         title: { text: 'Tendencia Acumulada', left: 'center' },
-        tooltip: { trigger: 'axis', formatter: params => `${params[0].axisValue}<br/>Acumulado: $${params[0].data.toFixed(2)}` },
+        tooltip: { trigger: 'axis', formatter: params => `${params[0].axisValue}<br/>Acumulado: C$${params[0].data.toFixed(2)}` },
         xAxis: { type: 'category', data: fechasOrdenadas, axisLabel: { rotate: 45 } },
-        yAxis: { type: 'value', axisLabel: { formatter: val => `$${val}` } },
+        yAxis: { type: 'value', axisLabel: { formatter: val => `C$${val}` } },
         series: [{
           data: acumulados,
           type: 'line',
@@ -562,7 +562,7 @@
         .map(([nombre, ingreso]) => ({ value: ingreso, name: nombre }));
       const optionDonut = {
         title: { text: 'Distribución Ingresos por Producto', left: 'center' },
-        tooltip: { trigger: 'item', formatter: '{b}: ${c} ({d}%)' },
+        tooltip: { trigger: 'item', formatter: '{b}: C${c} ({d}%)' },
         legend: { bottom: 10, type: 'scroll' },
         series: [
           {
@@ -580,13 +580,13 @@
       charts.donut.setOption(optionDonut);
 
       // Chart bullet (rendimiento ingresos)
-      // Suposición simple: Target diario fijo $5000, datos actuales promedio ingresos diarios
+      // Suposición simple: Target diario fijo C$5000, datos actuales promedio ingresos diarios
       const ingresosPorDiaArr = Object.values(ingresosPorDia);
       const avgIngresosDia = ingresosPorDiaArr.length ? ingresosPorDiaArr.reduce((a,b)=>a+b,0)/ingresosPorDiaArr.length : 0;
       const targetDiario = 5000;
       const optionBullet = {
         title: { text: 'Bullet Chart Rendimiento Ingresos', left: 'center' },
-        tooltip: { formatter: params => `Ingresos: $${params.value}` },
+        tooltip: { formatter: params => `Ingresos: C$${params.value}` },
         xAxis: { max: targetDiario * 2, splitLine: { show: false } },
         yAxis: { type: 'category', data: ['Ingresos'], axisTick: { show: false }, axisLine: { show: false }, axisLabel: { show: false } },
         series: [
@@ -596,14 +596,14 @@
             itemStyle: { color: '#ddd' },
             barWidth: 20,
             barGap: '-100%',
-            label: { show: true, position: 'insideRight', formatter: `Target $${targetDiario}` }
+            label: { show: true, position: 'insideRight', formatter: `Target C$${targetDiario}` }
           },
           {
             type: 'bar',
             data: [avgIngresosDia],
             itemStyle: { color: '#20c997' },
             barWidth: 20,
-            label: { show: true, position: 'insideRight', formatter: `Actual $${avgIngresosDia.toFixed(2)}` }
+            label: { show: true, position: 'insideRight', formatter: `Actual C$${avgIngresosDia.toFixed(2)}` }
           }
         ]
       };
