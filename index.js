@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middlewares
-app.use(cors()); // Habilita CORS
+app.use(cors()); 
 app.use(express.json());
 
 // Mostrar contenido del .env en consola (solo para pruebas)
@@ -33,6 +33,33 @@ app.get('/', (req, res) => {
   res.send('Servidor corriendo y conectado a Supabase!');
 });
 
+// Función para obtener fecha y hora en Nicaragua
+function obtenerFechaHoraNicaragua() {
+  const tz = "America/Managua";
+  const now = new Date();
+
+  const fechaStr = new Intl.DateTimeFormat("es-NI", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(now);
+
+  // El formato viene como DD/MM/AAAA → lo pasamos a AAAA-MM-DD
+  const [dia, mes, anio] = fechaStr.split("/");
+  const fechaFinal = `${anio}-${mes}-${dia}`;
+
+  const horaFinal = new Intl.DateTimeFormat("es-NI", {
+    timeZone: tz,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  }).format(now);
+
+  return { fechaFinal, horaFinal };
+}
+
 // Ruta para registrar o cancelar ventas
 app.post('/', async (req, res) => {
   const { accion = "registrar", productos } = req.body;
@@ -41,17 +68,15 @@ app.post('/', async (req, res) => {
     return res.status(400).json({ error: 'La lista de productos vendidos es obligatoria' });
   }
 
-  const now = new Date();
-  const fecha = now.toISOString().slice(0, 10);
-  const hora = now.toTimeString().slice(0, 8);
+  const { fechaFinal, horaFinal } = obtenerFechaHoraNicaragua();
 
   try {
     if (accion === "registrar") {
       const filas = productos.map(item => ({
         producto_id: item.producto_id,
         cantidad: item.cantidad,
-        fecha,
-        hora
+        fecha: fechaFinal,
+        hora: horaFinal
       }));
 
       const { data, error } = await supabase
