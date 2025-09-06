@@ -62,7 +62,6 @@ function normalizarFechaAISO(fechaInput) {
   // 4) Intentar parsear con Date (fallback). Si parsea, formatear según zona America/Managua
   const parsed = new Date(s);
   if (!isNaN(parsed.getTime())) {
-    // Usamos Intl para obtener día/mes/año en la zona de Nicaragua
     const tz = "America/Managua";
     const fechaStr = new Intl.DateTimeFormat("es-NI", {
       timeZone: tz,
@@ -169,21 +168,19 @@ app.post('/', async (req, res) => {
 
       return res.status(200).json({ mensaje: 'Venta registrada correctamente', data });
     } else if (accion === "cancelar") {
-      // Dos flujos principales:
-      // A) cancelar por fecha global sin productos -> eliminar todas las filas de esa fecha
-      // B) cancelar por fecha + productos -> para cada producto, comprobar sum(cantidad) en esa fecha y
-      //    eliminar/ajustar solo la cantidad solicitada (si hay suficiente). Si falta cantidad para algún producto,
-      //    NO se realiza ninguna modificación y se devuelve error explicando cuál producto no tiene suficiente.
-      // C) si vienen productos pero sin fecha -> comportamiento anterior (buscar en todas las fechas)
+      // Nota importante de seguridad: solo interpretamos "borrar todo el día" si
+      // el cliente NO envió el campo productos (productos === undefined || productos === null).
+      // Si vino un array vacío [], lo tratamos como intención de cancelar por producto, y
+      // requerimos que contenga items para poder proceder.
+      const productosPresentes = Array.isArray(productos) ? productos.length > 0 : false;
 
-      // Si no vienen productos, y sí viene fecha -> borrar todo lo de esa fecha
-      if ((!productos || !Array.isArray(productos) || productos.length === 0) && fechaGlobalISO) {
-        // Borrar todas las filas con fecha = fechaGlobalISO
+      // Si NO vienen productos (campo ausente/null/undefined) y SÍ viene fecha -> borrar todo lo de esa fecha
+      if ((productos === undefined || productos === null) && fechaGlobalISO) {
         const { data: deletedRows, error: errDel } = await supabase
           .from('ventas')
           .delete()
           .eq('fecha', fechaGlobalISO)
-          .select('id'); // devolver ids eliminados
+          .select('id');
 
         if (errDel) {
           console.error('Error eliminando ventas por fecha:', errDel);
@@ -199,25 +196,25 @@ app.post('/', async (req, res) => {
       }
 
       // Si vienen productos y también fechaGlobalISO -> cancelación por producto en esa fecha
-      if (Array.isArray(productos) && productos.length > 0 && fechaGlobalISO) {
-        // 1) Validaciones de input
+      if (productosPresentes && fechaGlobalISO) {
+        // Validaciones de input
         for (const item of productos) {
           if (!item.producto_id || typeof item.cantidad !== 'number' || item.cantidad <= 0) {
             return res.status(400).json({ error: 'Cada producto necesita producto_id y cantidad (número > 0) para cancelar' });
           }
         }
 
-        // 2) Verificar disponibilidad para todos los productos primero (operación "todo o nada")
+        // 1) Verificar disponibilidad para todos los productos primero (operación "todo o nada")
         const insuficientes = [];
         const disponibilidadMap = {}; // producto_id -> { totalDisponible, filas: [...] }
 
         for (const item of productos) {
-          const { data: filasVentas, error: errSelect } = await supabase
+          const { data: filasVentas = [], error: errSelect } = await supabase
             .from('ventas')
             .select('*')
             .eq('producto_id', item.producto_id)
             .eq('fecha', fechaGlobalISO)
-            .order('hora', { ascending: false }); // procesamos de hora más reciente a más antigua
+            .order('hora', { ascending: false }); // de más reciente a más antiguo
 
           if (errSelect) {
             console.error('Error seleccionando ventas para cancelar (por fecha):', errSelect);
@@ -234,21 +231,32 @@ app.post('/', async (req, res) => {
               disponible: totalDisponible
             });
           }
+
+          // Si no existe ninguna fila para ese producto en la fecha, también tratar como insuficiente
+          if ((filasVentas || []).length === 0) {
+            insuficientes.push({
+              producto_id: item.producto_id,
+              solicitado: item.cantidad,
+              disponible: 0
+            });
+          }
         }
 
         if (insuficientes.length > 0) {
           // No hacemos ninguna modificación — informamos qué productos no alcanzan
+          // Mensaje solicitado por el usuario: "No se encontraron productos con tales criterios"
           return res.status(400).json({
-            error: 'Cantidad insuficiente para uno o varios productos en la fecha indicada',
+            error: 'No se encontraron productos con tales criterios',
             detalles: insuficientes
           });
         }
 
-        // 3) Si hay suficiente para todos, procedemos a eliminar/ajustar por producto,
+        // 2) Si hay suficiente para todos, procedemos a eliminar/ajustar por producto,
         //    iterando por filas (de hora más reciente a más antigua) hasta cubrir la cantidad.
         const resultados = [];
+
         for (const item of productos) {
-          let cantidadAEliminar = item.cantidad;
+          let cantidadAEliminar = Number(item.cantidad);
           const filasVentas = disponibilidadMap[item.producto_id].filasVentas || [];
 
           let deletedIds = [];
@@ -258,13 +266,16 @@ app.post('/', async (req, res) => {
             if (cantidadAEliminar <= 0) break;
 
             const filaCantidad = Number(fila.cantidad) || 0;
+
             if (filaCantidad > cantidadAEliminar) {
-              // actualizar fila con nueva cantidad
+              // actualizar fila con nueva cantidad (resta parcial)
               const nuevaCantidad = filaCantidad - cantidadAEliminar;
-              const { error: errUpdate } = await supabase
+
+              const { data: updatedRow, error: errUpdate } = await supabase
                 .from('ventas')
                 .update({ cantidad: nuevaCantidad })
-                .eq('id', fila.id);
+                .eq('id', fila.id)
+                .select('id, cantidad');
 
               if (errUpdate) {
                 console.error('Error actualizando fila durante cancelación por fecha:', errUpdate);
@@ -276,10 +287,11 @@ app.post('/', async (req, res) => {
               break;
             } else {
               // eliminar fila completa
-              const { error: errDelete } = await supabase
+              const { data: delData, error: errDelete } = await supabase
                 .from('ventas')
                 .delete()
-                .eq('id', fila.id);
+                .eq('id', fila.id)
+                .select('id, cantidad');
 
               if (errDelete) {
                 console.error('Error eliminando fila durante cancelación por fecha:', errDelete);
@@ -310,16 +322,15 @@ app.post('/', async (req, res) => {
 
       // Si vienen productos pero NO viene fechaGlobalISO -> comportamiento anterior (compatibilidad)
       if (Array.isArray(productos) && productos.length > 0 && !fechaGlobalISO) {
-        // Reutilizamos la lógica previa: iterar por productos y eliminar/ajustar en orden por fecha/hora ascendente
-        const resultados = [];
+        // Reutilizamos la lógica previa: primero validar disponibilidad total para cada producto (todo o nada)
+        const insuficientes = [];
+
         for (const item of productos) {
-          if (!item.producto_id || typeof item.cantidad !== 'number') {
-            return res.status(400).json({ error: 'Cada producto necesita producto_id y cantidad (número) para cancelar' });
+          if (!item.producto_id || typeof item.cantidad !== 'number' || item.cantidad <= 0) {
+            return res.status(400).json({ error: 'Cada producto necesita producto_id y cantidad (número > 0) para cancelar' });
           }
 
-          let cantidadAEliminar = item.cantidad;
-
-          const { data: filasVentas, error: errSelect } = await supabase
+          const { data: filasVentas = [], error: errSelect } = await supabase
             .from('ventas')
             .select('*')
             .eq('producto_id', item.producto_id)
@@ -331,42 +342,73 @@ app.post('/', async (req, res) => {
             throw errSelect;
           }
 
-          let deletedIds = [];
-          let updated = [];
           const totalDisponible = (filasVentas || []).reduce((s, f) => s + (Number(f.cantidad) || 0), 0);
 
           if (totalDisponible < item.cantidad) {
-            return res.status(400).json({
-              error: `Cantidad insuficiente para producto ${item.producto_id}. Disponible: ${totalDisponible}, solicitado: ${item.cantidad}`
+            insuficientes.push({
+              producto_id: item.producto_id,
+              solicitado: item.cantidad,
+              disponible: totalDisponible
             });
           }
+        }
+
+        if (insuficientes.length > 0) {
+          return res.status(400).json({
+            error: 'No se encontraron productos con tales criterios',
+            detalles: insuficientes
+          });
+        }
+
+        // Si hay suficiente, proceder
+        const resultados = [];
+        for (const item of productos) {
+          let cantidadAEliminar = item.cantidad;
+
+          const { data: filasVentas = [], error: errSelect } = await supabase
+            .from('ventas')
+            .select('*')
+            .eq('producto_id', item.producto_id)
+            .order('fecha', { ascending: true })
+            .order('hora', { ascending: true });
+
+          if (errSelect) {
+            console.error('Error seleccionando ventas para cancelar (sin fecha):', errSelect);
+            throw errSelect;
+          }
+
+          let deletedIds = [];
+          let updated = [];
 
           for (const fila of filasVentas) {
             if (cantidadAEliminar <= 0) break;
 
-            if (fila.cantidad > cantidadAEliminar) {
-              const nuevaCantidad = fila.cantidad - cantidadAEliminar;
+            const filaCantidad = Number(fila.cantidad) || 0;
+            if (filaCantidad > cantidadAEliminar) {
+              const nuevaCantidad = filaCantidad - cantidadAEliminar;
 
-              const { error: errUpdate } = await supabase
+              const { data: updatedRow, error: errUpdate } = await supabase
                 .from('ventas')
                 .update({ cantidad: nuevaCantidad })
-                .eq('id', fila.id);
+                .eq('id', fila.id)
+                .select('id, cantidad');
 
               if (errUpdate) throw errUpdate;
 
-              updated.push({ id: fila.id, antes: fila.cantidad, despues: nuevaCantidad });
+              updated.push({ id: fila.id, antes: filaCantidad, despues: nuevaCantidad });
               cantidadAEliminar = 0;
               break;
             } else {
-              const { error: errDelete } = await supabase
+              const { data: delData, error: errDelete } = await supabase
                 .from('ventas')
                 .delete()
-                .eq('id', fila.id);
+                .eq('id', fila.id)
+                .select('id, cantidad');
 
               if (errDelete) throw errDelete;
 
               deletedIds.push(fila.id);
-              cantidadAEliminar -= fila.cantidad;
+              cantidadAEliminar -= filaCantidad;
             }
           }
 
@@ -388,7 +430,7 @@ app.post('/', async (req, res) => {
 
       // Si llegamos aquí, no se reconoció el patrón de entrada
       return res.status(400).json({
-        error: 'Solicitud de cancelación no reconocida. Enviar "fecha" para cancelar por fecha, o "productos" para cancelar por productos.'
+        error: 'Solicitud de cancelación no reconocida. Enviar "fecha" para borrar todo el día (sin campo productos) o enviar "fecha" + "productos" para cancelar por producto en esa fecha.'
       });
     } else {
       return res.status(400).json({ error: 'Acción no reconocida. Use "registrar" o "cancelar"' });
