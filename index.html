@@ -703,53 +703,88 @@
   });
 
   // Confirmar cancelar por fecha (único flujo disponible ahora)
-  confirmarCancelarPorFechaBtn.addEventListener("click", async () => {
-    const fechaISO = document.getElementById("cancel-fecha").value;
-    if (!fechaISO) {
-      alert("Debes seleccionar la fecha a cancelar.");
-      cancelFechaPicker.open();
+ // Reemplazar la función existente para confirmarCancelarPorFechaBtn
+confirmarCancelarPorFechaBtn.addEventListener("click", async () => {
+  const fechaISO = document.getElementById("cancel-fecha").value;
+  if (!fechaISO) {
+    alert("Debes seleccionar la fecha a cancelar.");
+    cancelFechaPicker.open();
+    return;
+  }
+
+  const productosPayload = (ventaPopup || []).map(p => ({
+    producto_id: Number(p.codigo),
+    cantidad: Number(p.cantidad)
+  }));
+
+  for (const p of productosPayload) {
+    if (!p.producto_id || !Number.isFinite(p.cantidad) || p.cantidad <= 0) {
+      alert("Hay un producto en la lista con cantidad inválida. Revisa la lista antes de continuar.");
+      return;
+    }
+  }
+
+  if (productosPayload.length === 0) {
+    const confirmAll = prompt(
+      `Estás por eliminar TODAS las ventas del día ${fechaISO}.\n` +
+      `Si realmente deseas eliminar todo, escribe la palabra ELIMINAR y presiona Aceptar.`
+    );
+    if (!confirmAll || confirmAll.trim().toUpperCase() !== "ELIMINAR") {
+      return;
+    }
+  }
+
+  const confirmMsg = productosPayload.length > 0
+    ? `Vas a cancelar ${productosPayload.reduce((s,p)=>s+p.cantidad,0)} unidades del día ${fechaISO}. ¿Continuar?`
+    : `Vas a eliminar TODAS las ventas del día ${fechaISO}. ¿Continuar?`;
+
+  if (!confirm(confirmMsg)) return;
+
+  popupCancelSpinner.style.display = "block";
+  popupCancelMessage.textContent = "";
+  confirmarCancelarPorFechaBtn.disabled = true;
+
+  try {
+    const body = { accion: "cancelar", fecha: fechaISO };
+    if (productosPayload.length > 0) body.productos = productosPayload;
+
+    const response = await fetch("https://caja-k0wo.onrender.com/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    const respJson = await response.json().catch(()=>({}));
+
+    if (!response.ok) {
+      const serverMsg = respJson.error || respJson.mensaje || `Error ${response.status}`;
+      popupCancelMessage.textContent = `Error al cancelar: ${serverMsg}`;
       return;
     }
 
-    const confirmMsg = `Vas a cancelar ventas registradas en ${document.getElementById("cancel-fecha").value}.\nEsta acción puede eliminar registros. ¿Continuar?`;
-    if (!confirm(confirmMsg)) return;
+    popupCancelMessage.textContent = respJson.mensaje || "Operación completada con éxito.";
+    ventaPopup = [];
+    venta = [];
+    actualizarTabla();
+    actualizarTablaCancelPopup();
 
-    popupCancelSpinner.style.display = "block";
-    popupCancelMessage.textContent = "";
-    confirmarCancelarPorFechaBtn.disabled = true;
+  } catch (error) {
+    popupCancelMessage.textContent = `Error al cancelar por fecha: ${error.message}`;
+  } finally {
+    // 🔄 apagar spinner y reactivar botón siempre
+    popupCancelSpinner.style.display = "none";
+    confirmarCancelarPorFechaBtn.disabled = false;
 
-    try {
-      // Nota: el backend debe ser ajustado para aceptar { accion: 'cancelar', fecha: 'YYYY-MM-DD' }
-      const response = await fetch("https://caja-k0wo.onrender.com/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accion: "cancelar", fecha: fechaISO })
-      });
+    // 🔄 limpiar solo los campos de entrada, no el mensaje
+    cancelarProductoInput.value = '';
+    cancelarCantidadInput.value = '';
+    cancelList.innerHTML = '';
+    try { cancelFechaPicker.clear(); } catch(e){}
+    ventaPopup = [];
+    actualizarTablaCancelPopup();
+  }
+});
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(()=>({ error: `Error ${response.status}` }));
-        throw new Error(errorData.error || `Error ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      popupCancelSpinner.style.display = "none";
-      popupCancelMessage.textContent = "Ventas del día canceladas con éxito.";
-      confirmarCancelarPorFechaBtn.disabled = false;
-
-      // Opcional: refrescar tablas
-      ventaPopup = [];
-      venta = [];
-      actualizarTabla();
-      actualizarTablaCancelPopup();
-
-      // Mantener popup abierto para que el usuario lea el mensaje y cierre manualmente.
-    } catch (error) {
-      popupCancelSpinner.style.display = "none";
-      popupCancelMessage.textContent = `Error al cancelar por fecha: ${error.message}`;
-      confirmarCancelarPorFechaBtn.disabled = false;
-    }
-  });
   </script>
 </body>
 </html>
